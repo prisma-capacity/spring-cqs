@@ -19,12 +19,12 @@ import java.util.Optional;
 
 import eu.prismacapacity.spring.cqs.StateToken;
 
-public class ValueResponse<T> implements CommandResponse {
+public class CommandValueResponse<T> implements CommandResponse<T> {
 
 	private T value;
 	private StateToken token;
 
-	private ValueResponse(StateToken token, T value) {
+	private CommandValueResponse(StateToken token, T value) {
 		this.token = token;
 		this.value = value;
 	}
@@ -37,20 +37,20 @@ public class ValueResponse<T> implements CommandResponse {
 		return Optional.ofNullable(value);
 	}
 
-	ValueResponse<T> withValue(T value) {
-		return new ValueResponse<>(token, value);
+	public CommandValueResponse<T> withValue(T value) {
+		return new CommandValueResponse<>(token, value);
 	}
 
-	public static <T> ValueResponse<T> of(StateToken token, T value) {
-		return new ValueResponse<>(token, value);
+	public static <T> CommandValueResponse<T> of(StateToken token, T value) {
+		return new CommandValueResponse<>(token, value);
 	}
 
-	public static <T> ValueResponse<T> of(StateToken token) {
-		return new ValueResponse<>(token, null);
+	public static <T> CommandValueResponse<T> of(StateToken token) {
+		return new CommandValueResponse<>(token, null);
 	}
 
-	public static <T> ValueResponse<T> empty() {
-		return new ValueResponse<>(null, null);
+	public static <T> CommandValueResponse<T> empty() {
+		return new CommandValueResponse<>(null, null);
 	}
 
 }

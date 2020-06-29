@@ -15,10 +15,10 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
-import java.util.Optional;
+import lombok.NonNull;
 
-import eu.prismacapacity.spring.cqs.StateToken;
-
-public interface CommandResponse<T> {
-	public Optional<StateToken> getToken();
+public interface SimpleCommandHandler<C extends Command> extends CommandHandler<C, Void> {
+	@Override
+	@NonNull
+	CommandTokenResponse handle(@NonNull C cmd) throws CommandHandlingException;
 }

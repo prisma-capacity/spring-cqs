@@ -17,15 +17,15 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 public class CommandHandlingException extends RuntimeException {
 
-	CommandHandlingException(Throwable cause) {
+	public CommandHandlingException(Throwable cause) {
 		super(cause);
 	}
 
-	CommandHandlingException(String msg, Throwable cause) {
+	public CommandHandlingException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 
-	CommandHandlingException(String msg) {
+	public CommandHandlingException(String msg) {
 		super(msg);
 	}
 }

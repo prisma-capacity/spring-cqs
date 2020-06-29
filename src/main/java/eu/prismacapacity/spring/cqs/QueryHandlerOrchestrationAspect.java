@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.spring.cqs.cmd;
+package eu.prismacapacity.spring.cqs;
 
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -25,39 +26,43 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import eu.prismacapacity.spring.cqs.cmd.CommandHandlingException;
+import eu.prismacapacity.spring.cqs.cmd.CommandVerificationException;
+import eu.prismacapacity.spring.cqs.query.*;
+
 @Aspect
 @SuppressWarnings("unchecked")
-public class CommandHandlerOrchestrationAspect {
+public class QueryHandlerOrchestrationAspect {
 	protected final Validator validator;
 
-	protected CommandHandlerOrchestrationAspect() {
+	QueryHandlerOrchestrationAspect() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}
 
-	@Around("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))")
+	@Around("execution(* eu.prismacapacity.spring.cqs.query.QueryHandler.handle(..))")
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
 		return process(joinPoint);
 	}
 
-	private <C extends Command> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
+	private <Q extends Query> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
 
-		C cmd = (C) joinPoint.getArgs()[0];
-		CommandHandler<C, ?> target = (CommandHandler<C, ?>) joinPoint.getTarget();
+		Q cmd = (Q) joinPoint.getArgs()[0];
+		QueryHandler<Q, ?> target = (QueryHandler<Q, ?>) joinPoint.getTarget();
 
 		// validator based validate
-		Set<ConstraintViolation<C>> violations = validator.validate(cmd);
+		Set<ConstraintViolation<Q>> violations = validator.validate(cmd);
 		if (!violations.isEmpty()) {
-			throw new CommandValidationException(violations);
+			throw new QueryValidationException(violations);
 		}
 
 		// custom validate
 		try {
 			target.validate(cmd);
 		} catch (Exception e) {
-			if (e instanceof CommandValidationException) {
-				throw (CommandValidationException) e;
+			if (e instanceof QueryValidationException) {
+				throw (QueryValidationException) e;
 			} else {
-				throw new CommandValidationException(e);
+				throw new QueryValidationException(e);
 			}
 		}
 
@@ -65,8 +70,8 @@ public class CommandHandlerOrchestrationAspect {
 		try {
 			target.verify(cmd);
 		} catch (Exception e) {
-			if (e instanceof CommandVerificationException) {
-				throw (CommandVerificationException) e;
+			if (e instanceof QueryVerificationException) {
+				throw (QueryVerificationException) e;
 			} else {
 				throw new CommandVerificationException(e);
 			}
@@ -74,17 +79,24 @@ public class CommandHandlerOrchestrationAspect {
 
 		// execution
 		try {
-			CommandResponse result = target.handle(cmd);
+			QueryResponse<?> result = target.handle(cmd);
 			if (result == null) {
-				throw new CommandHandlingException("Response must not be null");
+				throw new QueryHandlingException("Response must not be null");
 			}
 			return result;
+
 		} catch (Exception e) {
-			if (e instanceof CommandHandlingException) {
-				throw (CommandHandlingException) e;
-			} else {
-				throw new CommandHandlingException(e);
+
+			// might be using sneakythrows... so this is intentional
+			if (e instanceof TimeoutException) {
+				throw new QueryTimeoutException((TimeoutException) e);
 			}
+
+			if (e instanceof QueryHandlingException) {
+				throw (QueryHandlingException) e;
+			}
+
+			throw new QueryHandlingException(e);
 
 		}
 	}

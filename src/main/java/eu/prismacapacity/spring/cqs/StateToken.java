@@ -19,7 +19,12 @@ import java.util.UUID;
 
 import lombok.Value;
 
-@Value
+@Value(staticConstructor = "of")
 public class StateToken {
 	UUID token;
+
+	public static StateToken random() {
+		return of(UUID.randomUUID());
+	}
+
 }

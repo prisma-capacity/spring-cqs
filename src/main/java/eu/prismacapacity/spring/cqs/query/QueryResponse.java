@@ -25,7 +25,7 @@ import eu.prismacapacity.spring.cqs.StateToken;
 @Setter
 @Accessors(chain = true)
 // beware, both members are nullable intentionally
-public class QueryResponse<T> {
+public final class QueryResponse<T> {
 	private T value;
 	private StateToken token;
 
@@ -48,6 +48,10 @@ public class QueryResponse<T> {
 
 	public static <T> QueryResponse<T> of(StateToken token, T value) {
 		return new QueryResponse<>(token, value);
+	}
+
+	public static <T> QueryResponse<T> of(T value) {
+		return new QueryResponse<>(null, value);
 	}
 
 	public static <T> QueryResponse<T> of(StateToken token) {

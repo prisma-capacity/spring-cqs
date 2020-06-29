@@ -17,13 +17,13 @@ package eu.prismacapacity.spring.cqs.query;
 
 import lombok.NonNull;
 
-interface QueryHandler<Q extends Query, R extends QueryResponse<?>> {
+public interface QueryHandler<Q extends Query, T> {
 	default void validate(@NonNull Q query) throws QueryValidationException {
 	}
 
 	void verify(@NonNull Q query) throws QueryVerificationException;
 
 	@NonNull
-	R handle(@NonNull Q query) throws QueryHandlingException, QueryTimeoutException;
+	QueryResponse<T> handle(@NonNull Q query) throws QueryHandlingException, QueryTimeoutException;
 
 }

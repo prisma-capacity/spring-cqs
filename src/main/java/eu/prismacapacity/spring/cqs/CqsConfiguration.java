@@ -13,30 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.spring.cqs.cmd;
+package eu.prismacapacity.spring.cqs;
 
-import java.util.Optional;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import eu.prismacapacity.spring.cqs.StateToken;
-
-public class TokenResponse implements eu.prismacapacity.spring.cqs.cmd.CommandResponse {
-
-	private TokenResponse(StateToken token) {
-		this.token = token;
+@Configuration
+public class CqsConfiguration {
+	@Bean
+	public CommandHandlerOrchestrationAspect commandHandlerOrchestrationAspect() {
+		return new CommandHandlerOrchestrationAspect();
 	}
 
-	private final StateToken token;
-
-	public Optional<StateToken> getToken() {
-		return Optional.ofNullable(token);
-	}
-
-	public static eu.prismacapacity.spring.cqs.cmd.CommandResponse from(StateToken token) {
-		return new TokenResponse(token);
-	}
-
-	public static eu.prismacapacity.spring.cqs.cmd.CommandResponse empty() {
-		return new TokenResponse(null);
+	@Bean
+	public QueryHandlerOrchestrationAspect queryHandlerOrchestrationAspect() {
+		return new QueryHandlerOrchestrationAspect();
 	}
 
 }
