@@ -1,0 +1,18 @@
+#!/bin/sh
+# https://github.com/shyiko/ktlint pre-commit hook
+
+
+
+
+FILES=`git diff --name-only --cached --relative | grep '\.kt$' |grep -v "\.kts"`
+echo Files that have changed: "$FILES"
+if [ -z "$FILES" ]
+then
+	echo "No ktlinting necessary"
+else
+	echo "ktlinting"
+	echo "$FILES"  |xargs ktlint --debug --verbose --color -F --relative 
+	if [ $? -ne 0 ]; then exit 1; fi
+	git add -u
+fi
+

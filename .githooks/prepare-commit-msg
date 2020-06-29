@@ -1,0 +1,35 @@
+#!/bin/bash
+
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+ISSUE_PATTERN="([A-Z]+\-[0-9]+)[^0-9]*";
+MSG=$(cat $1)
+FINAL="$MSG"
+
+# first, check, if message provided already contains an issue
+
+[[ "$MSG" =~ $ISSUE_PATTERN ]]
+ISSUE="${BASH_REMATCH[1]}"
+
+if [ -z "$ISSUE" ]
+then
+  # no issues provided, trying to guess it from branch name
+  [[ "${BRANCH_NAME}:" =~ $ISSUE_PATTERN ]]
+  ISSUE="${BASH_REMATCH[1]}"
+
+  if [ ! -z "$ISSUE" ]
+  then
+    # lucky me
+    FINAL="$ISSUE $MSG"
+  else
+    if [[ "$FINAL" == *"release"* ]]; then
+      # assumeing, we're in maven replease plugin
+      exit 0
+    else
+      echo "No issue provided in commit message and none retrievable from branch no, so.... computer says no."
+      exit 1
+    fi
+  fi
+fi
+
+echo "$FINAL">$1
+
