@@ -18,6 +18,9 @@ package eu.prismacapacity.spring.cqs;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import eu.prismacapacity.spring.cqs.cmd.CommandHandlerOrchestrationAspect;
+import eu.prismacapacity.spring.cqs.query.QueryHandlerOrchestrationAspect;
+
 @Configuration
 public class CqsConfiguration {
 	@Bean

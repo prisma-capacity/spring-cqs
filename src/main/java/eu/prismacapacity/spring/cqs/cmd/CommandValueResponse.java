@@ -15,18 +15,18 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
-import eu.prismacapacity.spring.cqs.StateToken;
 import lombok.Value;
+
+import eu.prismacapacity.spring.cqs.StateToken;
 
 @Value(staticConstructor = "of")
 public class CommandValueResponse<T> implements CommandResponse<T> {
 
-    StateToken token;
-    T value;
+	StateToken token;
+	T value;
 
-
-    public static <T> CommandValueResponse<T> empty() {
-        return of(null, null);
-    }
+	public static <T> CommandValueResponse<T> empty() {
+		return of(null, null);
+	}
 
 }

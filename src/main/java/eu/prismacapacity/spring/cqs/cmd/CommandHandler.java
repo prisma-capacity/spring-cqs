@@ -17,22 +17,8 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 import lombok.NonNull;
 
-/**
- * see {@link SimpleCommandHandler} and {@link ValueCommandHandler} for ease of
- * use.
- *
- * @param <C>
- *            CommandType
- * @param <T>
- *            Type of Response value
- */
-public interface CommandHandler<C extends Command, T> {
-	default void validate(@NonNull C cmd) throws CommandValidationException {
-	}
-
-	void verify(@NonNull C cmd) throws CommandVerificationException;
+public interface CommandHandler<C extends Command> extends ICommandHandler<C> {
 
 	@NonNull
-	CommandResponse<T> handle(@NonNull C cmd) throws CommandHandlingException;
-
+	CommandTokenResponse handle(@NonNull C cmd) throws CommandHandlingException;
 }

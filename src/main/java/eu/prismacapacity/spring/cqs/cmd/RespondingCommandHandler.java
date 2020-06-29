@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.spring.cqs.query;
+package eu.prismacapacity.spring.cqs.cmd;
 
-import lombok.Getter;
+import lombok.NonNull;
 
-// beware, both members are nullable intentionally
-public final class QueryResponse<T> {
-	@Getter
-	private T value;
+public interface RespondingCommandHandler<C extends Command, T> extends ICommandHandler<C> {
 
-	private QueryResponse(T value) {
-		this.value = value;
-	}
-
-	public static <T> QueryResponse<T> of(T value) {
-		return new QueryResponse<>(value);
-	}
-
-	public static <T> QueryResponse<T> empty() {
-		return new QueryResponse<>(null);
-	}
+	@NonNull
+	CommandValueResponse<T> handle(@NonNull C cmd) throws CommandHandlingException;
 
 }

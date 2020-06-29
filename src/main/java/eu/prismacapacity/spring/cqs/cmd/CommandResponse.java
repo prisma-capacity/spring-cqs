@@ -15,10 +15,8 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
-import java.util.Optional;
-
 import eu.prismacapacity.spring.cqs.StateToken;
 
 public interface CommandResponse<T> {
-	public Optional<StateToken> getToken();
+	public StateToken getToken();
 }

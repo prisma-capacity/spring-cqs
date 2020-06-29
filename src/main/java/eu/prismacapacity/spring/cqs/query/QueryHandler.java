@@ -24,6 +24,6 @@ public interface QueryHandler<Q extends Query, T> {
 	void verify(@NonNull Q query) throws QueryVerificationException;
 
 	@NonNull
-	QueryResponse<T> handle(@NonNull Q query) throws QueryHandlingException, QueryTimeoutException;
+	T handle(@NonNull Q query) throws QueryHandlingException, QueryTimeoutException;
 
 }
