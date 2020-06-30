@@ -43,12 +43,10 @@ public class CqsConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public CqsMetrics metrics(
-			MeterRegistry meterRegistry,
+	public CqsMetrics metrics(MeterRegistry meterRegistry,
 			@Value("${cqs.command.timer-name:commandHandler.timed}") String commandHandlerTimerName,
 			@Value("${cqs.query.timer-name:queryHandler.timed}") String queryHandlerTimerName,
-			@Value("${cqs.query.timeout-name:queryHandler.timeOutDuringExecution}") String timeoutDuringQueryCounterName
-	) {
+			@Value("${cqs.query.timeout-name:queryHandler.timeOutDuringExecution}") String timeoutDuringQueryCounterName) {
 		return new CqsMetrics(meterRegistry, queryHandlerTimerName, timeoutDuringQueryCounterName,
 				commandHandlerTimerName);
 
