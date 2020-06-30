@@ -15,6 +15,8 @@
  */
 package eu.prismacapacity.spring.cqs;
 
+import javax.validation.Validator;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,13 +26,13 @@ import eu.prismacapacity.spring.cqs.query.QueryHandlerOrchestrationAspect;
 @Configuration
 public class CqsConfiguration {
 	@Bean
-	public CommandHandlerOrchestrationAspect commandHandlerOrchestrationAspect() {
-		return new CommandHandlerOrchestrationAspect();
+	public CommandHandlerOrchestrationAspect commandHandlerOrchestrationAspect(Validator v) {
+		return new CommandHandlerOrchestrationAspect(v);
 	}
 
 	@Bean
-	public QueryHandlerOrchestrationAspect queryHandlerOrchestrationAspect() {
-		return new QueryHandlerOrchestrationAspect();
+	public QueryHandlerOrchestrationAspect queryHandlerOrchestrationAspect(Validator v) {
+		return new QueryHandlerOrchestrationAspect(v);
 	}
 
 }

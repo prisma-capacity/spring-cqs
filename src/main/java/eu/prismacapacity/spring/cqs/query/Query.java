@@ -15,5 +15,8 @@
  */
 package eu.prismacapacity.spring.cqs.query;
 
+/**
+ * marker class, base for all queries
+ */
 public interface Query {
 }

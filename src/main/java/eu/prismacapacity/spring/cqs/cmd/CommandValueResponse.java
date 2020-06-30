@@ -19,6 +19,9 @@ import lombok.Value;
 
 import eu.prismacapacity.spring.cqs.StateToken;
 
+/**
+ * Both token and value can be null.
+ */
 @Value(staticConstructor = "of")
 public class CommandValueResponse<T> {
 

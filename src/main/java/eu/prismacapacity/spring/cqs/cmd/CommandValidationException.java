@@ -21,23 +21,29 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 import eu.prismacapacity.spring.cqs.Violations;
 
+/**
+ * happened while bean validation of the incoming command, or during execution
+ * of the validate method of a ({@link RespondingCommandHandler} or
+ * {@link CommandHandler}
+ */
 public class CommandValidationException extends CommandHandlingException {
 	@Getter
 	private Set<? extends ConstraintViolation<? extends Command>> violations = new HashSet<>();
 
-	public CommandValidationException(Set<? extends ConstraintViolation<? extends Command>> violations) {
+	public CommandValidationException(@NonNull Set<? extends ConstraintViolation<? extends Command>> violations) {
 		super(Violations.render(violations));
 		this.violations = violations;
 	}
 
-	public CommandValidationException(String msg, Exception e) {
+	public CommandValidationException(@NonNull String msg, @NonNull Throwable e) {
 		super(msg, e);
 	}
 
-	public CommandValidationException(Exception e) {
+	public CommandValidationException(@NonNull Throwable e) {
 		super(e);
 	}
 }

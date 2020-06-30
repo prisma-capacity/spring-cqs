@@ -19,9 +19,9 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -31,21 +31,24 @@ import org.aspectj.lang.annotation.Aspect;
 import eu.prismacapacity.spring.cqs.cmd.CommandHandlingException;
 import eu.prismacapacity.spring.cqs.cmd.CommandVerificationException;
 
+/**
+ * Orchestrates the validation/verification/execution handling of a QueryHandler
+ * and also maps exceptions if necessary. Using an aspect in this way is kind of
+ * a stretch. However, we had aspects, then an abstract class, then aspects
+ * again. This is the current incarnation :D
+ */
 @Aspect
+@RequiredArgsConstructor
 @SuppressWarnings("unchecked")
-public class QueryHandlerOrchestrationAspect {
+public final class QueryHandlerOrchestrationAspect {
 	protected final Validator validator;
-
-	public QueryHandlerOrchestrationAspect() {
-		validator = Validation.buildDefaultValidatorFactory().getValidator();
-	}
 
 	@Around("execution(* eu.prismacapacity.spring.cqs.query.QueryHandler.handle(..))")
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
 		return process(joinPoint);
 	}
 
-	private <Q extends Query> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
+	protected <Q extends Query> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
 
 		Q cmd = (Q) joinPoint.getArgs()[0];
 		QueryHandler<Q, ?> target = (QueryHandler<Q, ?>) joinPoint.getTarget();
@@ -82,13 +85,11 @@ public class QueryHandlerOrchestrationAspect {
 		try {
 			val result = joinPoint.proceed();
 			if (result == null) {
-				throw new QueryHandlingException("Response must not be null");
+				throw new QueryHandlingException("Returned object must not be null");
 			}
 			return result;
 
 		} catch (Throwable e) {
-
-			// might be using sneakythrows... so this is intentional
 			if (e instanceof TimeoutException) {
 				throw new QueryTimeoutException((TimeoutException) e);
 			}
@@ -98,7 +99,6 @@ public class QueryHandlerOrchestrationAspect {
 			}
 
 			throw new QueryHandlingException(e);
-
 		}
 	}
 }

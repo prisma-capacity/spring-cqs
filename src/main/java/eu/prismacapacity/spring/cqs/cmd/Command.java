@@ -15,5 +15,8 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
+/**
+ * marker interface, base for any kind of Command.
+ */
 public interface Command {
 }

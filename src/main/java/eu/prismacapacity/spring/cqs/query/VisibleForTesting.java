@@ -15,22 +15,14 @@
  */
 package eu.prismacapacity.spring.cqs.query;
 
-import lombok.NonNull;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * happened during execution of the verify method of a ({@link QueryHandler}
+ * this is duplicated to cmd and query package in order not to make it public
+ * (thus polluting the user's classpath)
  */
-public class QueryVerificationException extends QueryHandlingException {
 
-	public QueryVerificationException(@NonNull Exception e) {
-		super(e);
-	}
-
-	public QueryVerificationException(@NonNull String msg, @NonNull Throwable e) {
-		super(msg, e);
-	}
-
-	public QueryVerificationException(@NonNull String msg) {
-		super(msg);
-	}
+@Retention(RetentionPolicy.SOURCE)
+@interface VisibleForTesting {
 }

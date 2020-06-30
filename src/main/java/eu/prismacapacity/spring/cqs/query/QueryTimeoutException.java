@@ -17,8 +17,14 @@ package eu.prismacapacity.spring.cqs.query;
 
 import java.util.concurrent.TimeoutException;
 
+import lombok.NonNull;
+
+/**
+ * Wraps a TimeoutException, as there might be extra handling for this kind of
+ * exception in upper layers.
+ */
 public class QueryTimeoutException extends QueryHandlingException {
-	public QueryTimeoutException(TimeoutException e) {
+	public QueryTimeoutException(@NonNull TimeoutException e) {
 		super(e);
 	}
 }

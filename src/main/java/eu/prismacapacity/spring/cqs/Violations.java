@@ -20,11 +20,17 @@ import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 
+import lombok.NonNull;
+
+/**
+ * can render Violations to a string for logging
+ */
 public class Violations {
 	private Violations() {
 	}
 
-	public static String render(Set<? extends ConstraintViolation<?>> violations) {
+	public static String render(@NonNull Set<? extends ConstraintViolation<?>> violations) {
 		return violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining("\n"));
 	}
+
 }

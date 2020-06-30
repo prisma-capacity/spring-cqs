@@ -17,6 +17,9 @@ package eu.prismacapacity.spring.cqs.query;
 
 import lombok.NonNull;
 
+/**
+ * Query handler returning T
+ */
 public interface QueryHandler<Q extends Query, T> {
 	default void validate(@NonNull Q query) throws QueryValidationException {
 	}

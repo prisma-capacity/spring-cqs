@@ -25,6 +25,10 @@ import lombok.NonNull;
 
 import eu.prismacapacity.spring.cqs.Violations;
 
+/**
+ * happened while bean validation of the incoming command, or during execution
+ * of the validate method of a ({@link QueryHandler}
+ */
 public class QueryValidationException extends QueryHandlingException {
 	@Getter
 	private Set<? extends ConstraintViolation<? extends Query>> violations = new HashSet<>();
@@ -34,11 +38,11 @@ public class QueryValidationException extends QueryHandlingException {
 		this.violations = violations;
 	}
 
-	public QueryValidationException(String msg, Exception e) {
+	public QueryValidationException(@NonNull String msg, @NonNull Throwable e) {
 		super(msg, e);
 	}
 
-	public QueryValidationException(Exception e) {
+	public QueryValidationException(@NonNull Throwable e) {
 		super(e);
 	}
 }

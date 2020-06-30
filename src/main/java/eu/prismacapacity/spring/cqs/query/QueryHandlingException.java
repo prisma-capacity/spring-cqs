@@ -16,13 +16,15 @@
 package eu.prismacapacity.spring.cqs.query;
 
 import lombok.NonNull;
-
+/**
+ * happened while executing the handle method of a ({@link QueryHandler}
+ */
 public class QueryHandlingException extends RuntimeException {
 	public QueryHandlingException(@NonNull String msg) {
 		super(msg);
 	}
 
-	public QueryHandlingException(Throwable e) {
+	public QueryHandlingException(@NonNull Throwable e) {
 		super(e);
 	}
 

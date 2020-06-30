@@ -15,13 +15,20 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
+import lombok.NonNull;
+
+/**
+ * happened during execution of the verify method of a
+ * ({@link RespondingCommandHandler} or {@link CommandHandler}
+ */
+
 public class CommandVerificationException extends CommandHandlingException {
 
-	public CommandVerificationException(Exception e) {
+	public CommandVerificationException(@NonNull Throwable e) {
 		super(e);
 	}
 
-	public CommandVerificationException(String msg, Exception e) {
+	public CommandVerificationException(@NonNull String msg, @NonNull Throwable e) {
 		super(msg, e);
 	}
 }

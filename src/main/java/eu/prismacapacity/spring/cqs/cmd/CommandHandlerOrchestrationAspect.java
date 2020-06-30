@@ -18,23 +18,26 @@ package eu.prismacapacity.spring.cqs.cmd;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
 
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+/**
+ * Orchestrates the validation/verification/execution handling of a
+ * (Responding)CommandHandler and also maps exceptions if necessary. Using an
+ * aspect in this way is kind of a stretch. However, we had aspects, then an
+ * abstract class, then aspects again. This is the current incarnation :D
+ */
 @Aspect
 @SuppressWarnings("unchecked")
+@RequiredArgsConstructor
 public final class CommandHandlerOrchestrationAspect {
 	protected final Validator validator;
-
-	public CommandHandlerOrchestrationAspect() {
-		validator = Validation.buildDefaultValidatorFactory().getValidator();
-	}
 
 	@Around("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))")
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -46,7 +49,8 @@ public final class CommandHandlerOrchestrationAspect {
 		return process(joinPoint);
 	}
 
-	private <C extends Command> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
+	@VisibleForTesting
+	protected <C extends Command> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
 
 		C cmd = (C) joinPoint.getArgs()[0];
 		ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();

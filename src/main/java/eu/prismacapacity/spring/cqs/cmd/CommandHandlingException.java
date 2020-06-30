@@ -15,17 +15,23 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
+import lombok.NonNull;
+
+/**
+ * happened while executing the handle method of a
+ * ({@link RespondingCommandHandler} or {@link CommandHandler}
+ */
 public class CommandHandlingException extends RuntimeException {
 
-	public CommandHandlingException(Throwable cause) {
+	public CommandHandlingException(@NonNull Throwable cause) {
 		super(cause);
 	}
 
-	public CommandHandlingException(String msg, Throwable cause) {
+	public CommandHandlingException(@NonNull String msg, @NonNull Throwable cause) {
 		super(msg, cause);
 	}
 
-	public CommandHandlingException(String msg) {
+	public CommandHandlingException(@NonNull String msg) {
 		super(msg);
 	}
 }
