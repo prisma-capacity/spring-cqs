@@ -17,13 +17,15 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 import lombok.NonNull;
 
+/**
+ * This type is not to be used from the outside, as its primary purpose is just
+ * accessing the common methods of CommandHandlers. Therefore, this type is not
+ * public.
+ */
 interface ICommandHandler<C extends Command> {
 	default void validate(@NonNull C cmd) throws CommandValidationException {
 	}
 
 	void verify(@NonNull C cmd) throws CommandVerificationException;
-
-	@NonNull
-	Object handle(@NonNull C cmd) throws CommandHandlingException;
 
 }

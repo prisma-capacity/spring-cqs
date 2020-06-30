@@ -21,6 +21,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import lombok.val;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -79,18 +81,17 @@ public final class CommandHandlerOrchestrationAspect {
 
 		// execution
 		try {
-			Object result = target.handle(cmd);
+			val result = joinPoint.proceed();
 			if (result == null) {
 				throw new CommandHandlingException("Response must not be null");
 			}
 			return result;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			if (e instanceof CommandHandlingException) {
 				throw (CommandHandlingException) e;
 			} else {
 				throw new CommandHandlingException(e);
 			}
-
 		}
 	}
 }

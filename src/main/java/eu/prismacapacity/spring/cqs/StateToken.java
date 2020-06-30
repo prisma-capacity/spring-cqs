@@ -23,6 +23,11 @@ import lombok.Value;
 public class StateToken {
 	UUID token;
 
+	/**
+	 * primarily used for testing
+	 *
+	 * @return a StateToken with a random uuid
+	 */
 	public static StateToken random() {
 		return of(UUID.randomUUID());
 	}

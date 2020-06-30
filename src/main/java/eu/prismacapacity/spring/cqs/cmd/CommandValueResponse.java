@@ -20,7 +20,7 @@ import lombok.Value;
 import eu.prismacapacity.spring.cqs.StateToken;
 
 @Value(staticConstructor = "of")
-public class CommandValueResponse<T> implements CommandResponse<T> {
+public class CommandValueResponse<T> {
 
 	StateToken token;
 	T value;

@@ -22,6 +22,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import lombok.val;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -78,13 +80,13 @@ public class QueryHandlerOrchestrationAspect {
 
 		// execution
 		try {
-			Object result = target.handle(cmd);
+			val result = joinPoint.proceed();
 			if (result == null) {
 				throw new QueryHandlingException("Response must not be null");
 			}
 			return result;
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 
 			// might be using sneakythrows... so this is intentional
 			if (e instanceof TimeoutException) {
