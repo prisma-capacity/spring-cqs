@@ -21,13 +21,14 @@ import java.util.concurrent.TimeoutException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 /**
  * Orchestrates the validation/verification/execution handling of a QueryHandler
