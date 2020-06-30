@@ -21,16 +21,13 @@ import java.util.concurrent.TimeoutException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
-import eu.prismacapacity.spring.cqs.cmd.CommandHandlingException;
-import eu.prismacapacity.spring.cqs.cmd.CommandVerificationException;
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 /**
  * Orchestrates the validation/verification/execution handling of a QueryHandler
@@ -54,7 +51,7 @@ public final class QueryHandlerOrchestrationAspect {
 		return metrics.timedQuery(clazz, () -> process(joinPoint));
 	}
 
-	protected <Q extends Query> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
+	protected <Q extends Query> Object process(ProceedingJoinPoint joinPoint) throws QueryHandlingException {
 
 		Q cmd = (Q) joinPoint.getArgs()[0];
 		QueryHandler<Q, ?> target = (QueryHandler<Q, ?>) joinPoint.getTarget();
@@ -83,7 +80,7 @@ public final class QueryHandlerOrchestrationAspect {
 			if (e instanceof QueryVerificationException) {
 				throw (QueryVerificationException) e;
 			} else {
-				throw new CommandVerificationException(e);
+				throw new QueryVerificationException(e);
 			}
 		}
 
