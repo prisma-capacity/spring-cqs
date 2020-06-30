@@ -17,18 +17,20 @@ package eu.prismacapacity.spring.cqs.metrics;
 
 import java.util.function.Supplier;
 
-import lombok.NonNull;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
+import lombok.NonNull;
 
-public class Metrics implements CommandMetrics, QueryMetrics {
+public class CqsMetrics implements CommandMetrics, QueryMetrics {
 	private final MeterRegistry meterRegistry;
 	private final String queryHandlerTimerMetricName;
 	private final String queryHandlerTimeoutMetricName;
 	private final String commandHandlerTimerMetricName;
 
-	public Metrics(@NonNull MeterRegistry meterRegistry, @NonNull String queryHandlerTimerMetricName,
-			@NonNull String queryHandlerTimeoutMetricName, @NonNull String commandHandlerTimerMetricName) {
+	public CqsMetrics(
+			@NonNull MeterRegistry meterRegistry, @NonNull String queryHandlerTimerMetricName,
+			@NonNull String queryHandlerTimeoutMetricName, @NonNull String commandHandlerTimerMetricName
+	) {
 		this.meterRegistry = meterRegistry;
 		this.queryHandlerTimerMetricName = queryHandlerTimerMetricName;
 		this.queryHandlerTimeoutMetricName = queryHandlerTimeoutMetricName;

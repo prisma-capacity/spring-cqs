@@ -18,12 +18,13 @@ package eu.prismacapacity.spring.cqs;
 import javax.validation.Validator;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import eu.prismacapacity.spring.cqs.cmd.CommandHandlerOrchestrationAspect;
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
-import eu.prismacapacity.spring.cqs.metrics.Metrics;
+import eu.prismacapacity.spring.cqs.metrics.CqsMetrics;
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
 import eu.prismacapacity.spring.cqs.query.QueryHandlerOrchestrationAspect;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -41,11 +42,14 @@ public class CqsConfiguration {
 	}
 
 	@Bean
-	public Metrics metrics(MeterRegistry meterRegistry,
+	@ConditionalOnMissingBean
+	public CqsMetrics metrics(
+			MeterRegistry meterRegistry,
 			@Value("${spring-cqs.command.timer-name:commandHandler.timed}") String commandHandlerTimerName,
 			@Value("${spring-cqs.query.timer-name:queryHandler.timed}") String queryHandlerTimerName,
-			@Value("${spring-cqs.query.timeout-name:queryHandler.timeOutDuringExecution}") String timeoutDuringQueryCounterName) {
-		return new Metrics(meterRegistry, queryHandlerTimerName, timeoutDuringQueryCounterName,
+			@Value("${spring-cqs.query.timeout-name:queryHandler.timeOutDuringExecution}") String timeoutDuringQueryCounterName
+	) {
+		return new CqsMetrics(meterRegistry, queryHandlerTimerName, timeoutDuringQueryCounterName,
 				commandHandlerTimerName);
 
 	}
