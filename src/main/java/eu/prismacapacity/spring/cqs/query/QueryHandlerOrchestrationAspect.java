@@ -30,6 +30,7 @@ import org.aspectj.lang.annotation.Aspect;
 
 import eu.prismacapacity.spring.cqs.cmd.CommandHandlingException;
 import eu.prismacapacity.spring.cqs.cmd.CommandVerificationException;
+import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
 
 /**
  * Orchestrates the validation/verification/execution handling of a QueryHandler
@@ -38,14 +39,19 @@ import eu.prismacapacity.spring.cqs.cmd.CommandVerificationException;
  * again. This is the current incarnation :D
  */
 @Aspect
-@RequiredArgsConstructor
 @SuppressWarnings("unchecked")
+@RequiredArgsConstructor
 public final class QueryHandlerOrchestrationAspect {
 	protected final Validator validator;
 
+	protected final QueryMetrics metrics;
+
 	@Around("execution(* eu.prismacapacity.spring.cqs.query.QueryHandler.handle(..))")
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
-		return process(joinPoint);
+		val signature = joinPoint.getStaticPart().getSignature();
+		val clazz = signature.getDeclaringTypeName();
+
+		return metrics.timedQuery(clazz, () -> process(joinPoint));
 	}
 
 	protected <Q extends Query> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
@@ -91,6 +97,7 @@ public final class QueryHandlerOrchestrationAspect {
 
 		} catch (Throwable e) {
 			if (e instanceof TimeoutException) {
+				metrics.logTimeout();
 				throw new QueryTimeoutException((TimeoutException) e);
 			}
 

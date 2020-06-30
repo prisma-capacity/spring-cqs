@@ -26,6 +26,9 @@ import lombok.val;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+
+import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 
 /**
  * Orchestrates the validation/verification/execution handling of a
@@ -39,14 +42,22 @@ import org.aspectj.lang.annotation.Aspect;
 public final class CommandHandlerOrchestrationAspect {
 	protected final Validator validator;
 
-	@Around("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))")
-	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
-		return process(joinPoint);
+	protected final CommandMetrics metrics;
+
+	@Pointcut("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))")
+	public void commandHandlerPointCut() {
 	}
 
-	@Around("execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))")
-	public Object orchestrateResponding(ProceedingJoinPoint joinPoint) throws Throwable {
-		return process(joinPoint);
+	@Pointcut("execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))")
+	public void returningCommandHandlerPointCut() {
+	}
+
+	@Around("commandHandlerPointCut() || returningCommandHandlerPointCut()")
+	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
+		val signature = joinPoint.getStaticPart().getSignature();
+		val clazz = signature.getDeclaringTypeName();
+
+		return metrics.timedCommand(clazz, () -> process(joinPoint));
 	}
 
 	@VisibleForTesting
@@ -96,6 +107,7 @@ public final class CommandHandlerOrchestrationAspect {
 			} else {
 				throw new CommandHandlingException(e);
 			}
+
 		}
 	}
 }
