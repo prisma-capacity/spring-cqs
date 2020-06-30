@@ -45,9 +45,9 @@ public class CqsConfiguration {
 	@ConditionalOnMissingBean
 	public CqsMetrics metrics(
 			MeterRegistry meterRegistry,
-			@Value("${eu.prismacapacity.spring-cqs.command.timer-name:commandHandler.timed}") String commandHandlerTimerName,
-			@Value("${eu.prismacapacity.spring-cqs.query.timer-name:queryHandler.timed}") String queryHandlerTimerName,
-			@Value("${eu.prismacapacity.spring-cqs.query.timeout-name:queryHandler.timeOutDuringExecution}") String timeoutDuringQueryCounterName
+			@Value("${cqs.command.timer-name:commandHandler.timed}") String commandHandlerTimerName,
+			@Value("${cqs.query.timer-name:queryHandler.timed}") String queryHandlerTimerName,
+			@Value("${cqs.query.timeout-name:queryHandler.timeOutDuringExecution}") String timeoutDuringQueryCounterName
 	) {
 		return new CqsMetrics(meterRegistry, queryHandlerTimerName, timeoutDuringQueryCounterName,
 				commandHandlerTimerName);
