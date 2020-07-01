@@ -46,7 +46,7 @@ public class CqsMetrics implements CommandMetrics, QueryMetrics {
 	}
 
 	@Override
-	public <T> T timedQuery(String queryHandlerClass, Supplier<T> fn) {
+	public <T> T timedQuery(@NonNull String queryHandlerClass, @NonNull Supplier<T> fn) {
 		return meterRegistry.timer(queryHandlerTimerMetricName, Tags.of(Tags.of("class", queryHandlerClass)))
 				.record(fn);
 	}
