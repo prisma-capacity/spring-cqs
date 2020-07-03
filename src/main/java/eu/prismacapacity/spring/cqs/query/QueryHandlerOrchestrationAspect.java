@@ -66,23 +66,19 @@ public final class QueryHandlerOrchestrationAspect {
 		// custom validate
 		try {
 			target.validate(cmd);
-		} catch (Exception e) {
-			if (e instanceof QueryValidationException) {
-				throw (QueryValidationException) e;
-			} else {
-				throw new QueryValidationException(e);
-			}
+		} catch (QueryValidationException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new QueryValidationException(e);
 		}
 
 		// verification
 		try {
 			target.verify(cmd);
-		} catch (Exception e) {
-			if (e instanceof QueryVerificationException) {
-				throw (QueryVerificationException) e;
-			} else {
-				throw new QueryVerificationException(e);
-			}
+		} catch (QueryVerificationException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new QueryVerificationException(e);
 		}
 
 		// execution
@@ -92,17 +88,15 @@ public final class QueryHandlerOrchestrationAspect {
 				throw new QueryHandlingException("Returned object must not be null");
 			}
 			return result;
-
+		} catch (TimeoutException e) {
+			metrics.logTimeout();
+			throw new QueryTimeoutException((TimeoutException) e);
+		} catch (QueryTimeoutException e) {
+			metrics.logTimeout();
+			throw e;
+		} catch (QueryHandlingException e) {
+			throw e;
 		} catch (Throwable e) {
-			if (e instanceof TimeoutException) {
-				metrics.logTimeout();
-				throw new QueryTimeoutException((TimeoutException) e);
-			}
-
-			if (e instanceof QueryHandlingException) {
-				throw (QueryHandlingException) e;
-			}
-
 			throw new QueryHandlingException(e);
 		}
 	}

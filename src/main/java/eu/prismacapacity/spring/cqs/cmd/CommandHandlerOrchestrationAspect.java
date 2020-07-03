@@ -70,23 +70,19 @@ public final class CommandHandlerOrchestrationAspect {
 		// custom validate
 		try {
 			target.validate(cmd);
-		} catch (Exception e) {
-			if (e instanceof CommandValidationException) {
-				throw (CommandValidationException) e;
-			} else {
-				throw new CommandValidationException(e);
-			}
+		} catch (CommandValidationException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CommandValidationException(e);
 		}
 
 		// verification
 		try {
 			target.verify(cmd);
-		} catch (Exception e) {
-			if (e instanceof CommandVerificationException) {
-				throw (CommandVerificationException) e;
-			} else {
-				throw new CommandVerificationException(e);
-			}
+		} catch (CommandVerificationException e) {
+			throw e;
+		} catch (Throwable e) {
+			throw new CommandVerificationException(e);
 		}
 
 		// execution
@@ -96,13 +92,11 @@ public final class CommandHandlerOrchestrationAspect {
 				throw new CommandHandlingException("Response must not be null");
 			}
 			return result;
+		} catch (CommandHandlingException e) {
+			throw e;
 		} catch (Throwable e) {
-			if (e instanceof CommandHandlingException) {
-				throw (CommandHandlingException) e;
-			} else {
-				throw new CommandHandlingException(e);
-			}
-
+			throw new CommandHandlingException(e);
 		}
+
 	}
 }
