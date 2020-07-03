@@ -18,7 +18,7 @@ Simple abstractions we use to follow the CQS Principle in applications.
 
 The [CQS Principle](https://en.wikipedia.org/wiki/Command–query_separation) states that "every method should either be a command that performs an action, or a query that returns data to the caller, but not both." in order to reduce side-effects.
 
-In our projects we use abtractions like Query & QueryHandler as well as Command & CommandHandler to follow this principle. However, there is a bit of fineprint here that makes it worthwile to reuse this in form of a library:
+In our projects we use abtractions like Query & QueryHandler as well as Command & CommandHandler to follow this principle. However, there is a bit of fineprint here that makes it worthwhile to reuse this in form of a library:
 
 * a command / a query needs to be valid (as in java.validation valid), otherwise a Command/Query-ValidationExcption will be thrown
 * a command / a query needs to be valid (determined by an optional message on the handler), otherwise a Command/Query-ValidationExcption will be thrown
