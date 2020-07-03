@@ -27,7 +27,7 @@ In our projects we use abtractions like Query & QueryHandler as well as Command 
 
 In order to accomplish that, this kind of orchestration is done by an aspect, in order to get this out of that way when following the call stack in your IDE.
 
-This has pros and cons and migth be a questionale use of aspects, but we decided that this is the best solution for our context. You know, it depends...
+This has pros and cons and might be a debatable use of aspects, but we decided that this is the best solution for our context. You know, it depends...
 
 ### Usage
 
