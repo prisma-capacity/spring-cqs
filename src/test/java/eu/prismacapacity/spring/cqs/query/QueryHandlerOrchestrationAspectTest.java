@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 import javax.validation.ConstraintViolation;
@@ -253,7 +254,7 @@ class QueryHandlerOrchestrationAspectTest {
         }
 
         @Test
-        void handlesTimeout() throws Throwable {
+        void handlesQueryTimeoutException() throws Throwable {
             when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(query));
             when(handler.handle(query)).thenThrow(mock(QueryTimeoutException.class));
 
@@ -262,5 +263,15 @@ class QueryHandlerOrchestrationAspectTest {
             verify(metrics).logTimeout();
         }
 
+        @Test
+        void handlesTimeoutException() throws Throwable {
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(query));
+            when(handler.handle(query)).thenAnswer(invocation -> {
+                throw new TimeoutException();
+            });
+            Assertions.assertThrows(QueryTimeoutException.class, () -> underTest.process(joinPoint));
+
+            verify(metrics).logTimeout();
+        }
     }
 }
