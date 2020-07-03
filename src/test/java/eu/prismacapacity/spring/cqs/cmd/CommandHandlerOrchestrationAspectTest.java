@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 import lombok.NonNull;
+import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 class CommandHandlerOrchestrationAspectTest {
@@ -162,14 +163,10 @@ class CommandHandlerOrchestrationAspectTest {
 
             Assertions.assertThrows(CommandValidationException.class, () -> underTest.process(joinPoint));
             verify(validator, times(1)).validate(cmd);
-
-
         }
 
         @Test
         void customValidationFails() throws Throwable {
-
-
             doThrow(RuntimeException.class).when(handler).validate(cmd);
 
             Assertions.assertThrows(CommandValidationException.class, () -> underTest.process(joinPoint));
@@ -182,8 +179,6 @@ class CommandHandlerOrchestrationAspectTest {
 
         @Test
         void verificationFails() throws Throwable {
-
-
             doThrow(RuntimeException.class).when(handler).verify(cmd);
 
             Assertions.assertThrows(CommandVerificationException.class, () -> underTest.process(joinPoint));
@@ -207,6 +202,37 @@ class CommandHandlerOrchestrationAspectTest {
             verify(handler, times(1)).verify(cmd);
             verify(handler, times(1)).handle(cmd);
 
+        }
+
+
+        @Test
+        void customValidationFailsNoMapping() throws Throwable {
+            CommandValidationException e=new CommandValidationException(new RuntimeException());
+            doThrow(e).when(handler).validate(cmd);
+            val actual = Assertions.assertThrows(CommandValidationException.class, () -> underTest.process(joinPoint));
+            Assertions.assertSame(e, actual);
+        }
+
+        @Test
+        void verificationFailsNoMapping() throws Throwable {
+
+            CommandVerificationException e=new CommandVerificationException("",new RuntimeException());
+            doThrow(e).when(handler).verify(cmd);
+
+            val actual = Assertions.assertThrows(CommandVerificationException.class, () -> underTest.process(joinPoint));
+            Assertions.assertSame(e, actual);
+
+        }
+
+        @Test
+        void handlingFailsNoMapping() throws Throwable {
+            CommandHandlingException e=new CommandHandlingException("",new RuntimeException());
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(cmd));
+
+            when(handler.handle(cmd)).thenThrow(e);
+
+            val actual = Assertions.assertThrows(CommandHandlingException.class, () -> underTest.process(joinPoint));
+            Assertions.assertSame(e, actual);
         }
     }
 }
