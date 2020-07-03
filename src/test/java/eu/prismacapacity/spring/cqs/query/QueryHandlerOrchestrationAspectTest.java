@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
 import lombok.NonNull;
+import lombok.val;
 
 @ExtendWith(MockitoExtension.class)
 class QueryHandlerOrchestrationAspectTest {
@@ -211,5 +212,45 @@ class QueryHandlerOrchestrationAspectTest {
             verify(handler, times(1)).handle(query);
 
         }
+
+        @Test
+        void customValidationFailsNoMapping() throws Throwable {
+            QueryValidationException e = new QueryValidationException(new RuntimeException());
+            doThrow(e).when(handler).validate(query);
+            val actual = Assertions.assertThrows(QueryValidationException.class, () -> underTest.process(joinPoint));
+            Assertions.assertSame(e, actual);
+        }
+
+        @Test
+        void verificationFailsNoMapping() throws Throwable {
+
+            QueryVerificationException e = new QueryVerificationException("", new RuntimeException());
+            doThrow(e).when(handler).verify(query);
+
+            val actual = Assertions.assertThrows(QueryVerificationException.class, () -> underTest.process(joinPoint));
+            Assertions.assertSame(e, actual);
+
+        }
+
+        @Test
+        void handlingFailsNoMapping() throws Throwable {
+            QueryHandlingException e = new QueryHandlingException("", new RuntimeException());
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(query));
+
+            when(handler.handle(query)).thenThrow(e);
+
+            val actual = Assertions.assertThrows(QueryHandlingException.class, () -> underTest.process(joinPoint));
+            Assertions.assertSame(e, actual);
+        }
+
+        @Test
+        void preventsNullReturn() throws Throwable {
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(query));
+            when(handler.handle(query)).thenReturn(null);
+
+            Assertions.assertThrows(QueryHandlingException.class, () -> underTest.process(joinPoint));
+
+        }
+
     }
 }
