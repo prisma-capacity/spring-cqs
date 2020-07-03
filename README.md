@@ -50,7 +50,7 @@ The only thing you might want to configure is how Cqs uses Metrics. See @CqsConf
 #### Example
 
 Let's say, you have a Foo Entity and a corresponding repository. What we do with this lib is to encapsulate use-cases in a UI-agnosic manner. 
-````
+```java
 class FooEntity {
 }
 
@@ -76,5 +76,6 @@ class FooHandler implements QueryHandler<FooQuery, List<FooEntity>> {
         return myFooRepository.findById(query.idToLookFor);
     }
 }
-````
+```
 
+The idea here is (beyond javax.validation), you can quickly see the ins and outs of a use-case, may it be Query or Command, including checking for instance security constraints in a programmatic and technology agnostic way. Also this creates a nice seam between UI/Rest Layer and Domain Model or persistence model in case this is the same for you. If you're interested in checking and maintaing those bounds, have a look at for instance [Archunit](https://www.archunit.org/).
