@@ -47,3 +47,34 @@ This is meant to be used with Spring Boot. In order to get this running just add
 
 The only thing you might want to configure is how Cqs uses Metrics. See @CqsConfiguration for details.
 
+#### Example
+
+Let's say, you have a Foo Entity and a corresponding repository. What we do with this lib is to encapsulate use-cases in a UI-agnosic manner. 
+````
+class FooEntity {
+}
+
+class FooQuery implements Query {
+    @NotNull
+    UUID idToLookFor;
+    
+    @NotNull
+    Long userIdOfRequestingUser;
+}
+
+class FooHandler implements QueryHandler<FooQuery, List<FooEntity>> {
+
+    @Override
+    public void verify(@NonNull FooQuery query) throws QueryVerificationException {
+        // check if the preconditions for the query to be executed are met.
+        // we know userIdOfRequestingUser is not null (otherwise it would not have passed validation)
+        // but maybe we need to check if the user is assigned to the right organisation or something...
+    }
+
+    @Override
+    public List<FooEntity> handle(@NonNull FooQuery query) throws QueryHandlingException, QueryTimeoutException {
+        return myFooRepository.findById(query.idToLookFor);
+    }
+}
+````
+
