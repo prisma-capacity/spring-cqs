@@ -252,5 +252,15 @@ class QueryHandlerOrchestrationAspectTest {
 
         }
 
+        @Test
+        void handlesTimeout() throws Throwable {
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(query));
+            when(handler.handle(query)).thenThrow(mock(QueryTimeoutException.class));
+
+            Assertions.assertThrows(QueryTimeoutException.class, () -> underTest.process(joinPoint));
+
+            verify(metrics).logTimeout();
+        }
+
     }
 }

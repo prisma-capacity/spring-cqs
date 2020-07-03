@@ -22,7 +22,7 @@ import lombok.NonNull;
  */
 public class QueryVerificationException extends QueryHandlingException {
 
-	public QueryVerificationException(@NonNull Exception e) {
+	public QueryVerificationException(@NonNull Throwable e) {
 		super(e);
 	}
 
