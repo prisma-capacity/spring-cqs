@@ -26,7 +26,6 @@ import lombok.val;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 
@@ -44,15 +43,8 @@ public final class CommandHandlerOrchestrationAspect {
 
 	protected final CommandMetrics metrics;
 
-	@Pointcut("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))")
-	public void commandHandlerPointCut() {
-	}
-
-	@Pointcut("execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))")
-	public void returningCommandHandlerPointCut() {
-	}
-
-	@Around("commandHandlerPointCut() || returningCommandHandlerPointCut()")
+	@Around("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..)) || "
+			+ "execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))")
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
 		val signature = joinPoint.getStaticPart().getSignature();
 		val clazz = signature.getDeclaringTypeName();

@@ -242,5 +242,15 @@ class QueryHandlerOrchestrationAspectTest {
             val actual = Assertions.assertThrows(QueryHandlingException.class, () -> underTest.process(joinPoint));
             Assertions.assertSame(e, actual);
         }
+
+        @Test
+        void preventsNullReturn() throws Throwable {
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(query));
+            when(handler.handle(query)).thenReturn(null);
+
+            Assertions.assertThrows(QueryHandlingException.class, () -> underTest.process(joinPoint));
+
+        }
+
     }
 }

@@ -226,13 +226,22 @@ class CommandHandlerOrchestrationAspectTest {
 
         @Test
         void handlingFailsNoMapping() throws Throwable {
-            CommandHandlingException e=new CommandHandlingException("",new RuntimeException());
+            CommandHandlingException e = new CommandHandlingException("", new RuntimeException());
             when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(cmd));
 
             when(handler.handle(cmd)).thenThrow(e);
 
             val actual = Assertions.assertThrows(CommandHandlingException.class, () -> underTest.process(joinPoint));
             Assertions.assertSame(e, actual);
+        }
+
+        @Test
+        void preventsNullReturn() throws Throwable {
+            when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(cmd));
+            when(handler.handle(cmd)).thenReturn(null);
+
+            Assertions.assertThrows(CommandHandlingException.class, () -> underTest.process(joinPoint));
+
         }
     }
 }
