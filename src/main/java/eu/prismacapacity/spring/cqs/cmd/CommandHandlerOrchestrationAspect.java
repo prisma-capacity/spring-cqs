@@ -39,12 +39,15 @@ import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 @SuppressWarnings("unchecked")
 @RequiredArgsConstructor
 public final class CommandHandlerOrchestrationAspect {
+
+	private static final String PC_CommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))";
+	private static final String PC_RespondingCommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))";
+
 	protected final Validator validator;
 
 	protected final CommandMetrics metrics;
 
-	@Around("execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..)) || "
-			+ "execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))")
+	@Around(PC_CommandHandler + " || " + PC_RespondingCommandHandler)
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
 		val signature = joinPoint.getStaticPart().getSignature();
 		val clazz = signature.getDeclaringTypeName();
