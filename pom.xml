@@ -9,7 +9,7 @@
     <version>0.1.6</version>
   </parent>
   <artifactId>spring-cqs</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
   <name>CQS spring lib</name>
   <description>TODO</description>
