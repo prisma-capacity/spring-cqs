@@ -46,4 +46,8 @@ public class CommandValidationException extends CommandHandlingException {
 	public CommandValidationException(@NonNull Throwable e) {
 		super(e);
 	}
+
+	public CommandValidationException(@NonNull String msg) {
+		super(msg);
+	}
 }
