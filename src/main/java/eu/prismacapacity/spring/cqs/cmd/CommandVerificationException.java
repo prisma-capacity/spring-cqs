@@ -19,7 +19,7 @@ import lombok.NonNull;
 
 /**
  * happened during execution of the verify method of a
- * ({@link RespondingCommandHandler} or {@link CommandHandler}
+ * ({@link RespondingCommandHandler} or {@link TokenCommandHandler}
  */
 
 public class CommandVerificationException extends CommandHandlingException {
@@ -30,9 +30,5 @@ public class CommandVerificationException extends CommandHandlingException {
 
 	public CommandVerificationException(@NonNull String msg, @NonNull Throwable e) {
 		super(msg, e);
-	}
-
-	public CommandVerificationException(@NonNull String msg) {
-		super(msg);
 	}
 }

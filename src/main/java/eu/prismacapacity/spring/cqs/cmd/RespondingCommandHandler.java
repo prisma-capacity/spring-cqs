@@ -18,7 +18,7 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * Same as {@link CommandHandler}, but rather returns a typed
+ * Same as {@link TokenCommandHandler}, but rather returns a typed
  * {@link CommandValueResponse}
  */
 

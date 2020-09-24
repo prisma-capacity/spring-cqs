@@ -18,11 +18,10 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * A command handler that returns just a token as a response. Should be used as
+ * A command handler that returns void. Should be used as
  * a default.
  */
 public interface CommandHandler<C extends Command> extends ICommandHandler<C> {
 
-	@NonNull
-	CommandTokenResponse handle(@NonNull C cmd) throws CommandHandlingException;
+	void handle(@NonNull C cmd) throws CommandHandlingException;
 }

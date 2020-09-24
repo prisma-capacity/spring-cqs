@@ -18,20 +18,10 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * happened while executing the handle method of a
- * ({@link RespondingCommandHandler} or {@link TokenCommandHandler}
+ * A command handler that returns just a token as a response. Should be used if you need an indication token, only.
  */
-public class CommandHandlingException extends RuntimeException {
+public interface TokenCommandHandler<C extends Command> extends ICommandHandler<C> {
 
-	public CommandHandlingException(@NonNull Throwable cause) {
-		super(cause);
-	}
-
-	public CommandHandlingException(@NonNull String msg, @NonNull Throwable cause) {
-		super(msg, cause);
-	}
-
-	public CommandHandlingException(@NonNull String msg) {
-		super(msg);
-	}
+    @NonNull
+    CommandTokenResponse handle(@NonNull C cmd) throws CommandHandlingException;
 }

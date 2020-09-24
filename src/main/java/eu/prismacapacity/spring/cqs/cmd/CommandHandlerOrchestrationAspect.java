@@ -20,14 +20,13 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 /**
  * Orchestrates the validation/verification/execution handling of a
@@ -40,63 +39,68 @@ import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 @RequiredArgsConstructor
 public final class CommandHandlerOrchestrationAspect {
 
-	private static final String PC_CommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))";
-	private static final String PC_RespondingCommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))";
+    private static final String PC_CommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))";
+    private static final String PC_RespondingCommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))";
 
-	protected final Validator validator;
+    protected final Validator validator;
 
-	protected final CommandMetrics metrics;
+    protected final CommandMetrics metrics;
 
-	@Around(PC_CommandHandler + " || " + PC_RespondingCommandHandler)
-	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
-		val signature = joinPoint.getStaticPart().getSignature();
-		val clazz = signature.getDeclaringTypeName();
+    @Around(PC_CommandHandler + " || " + PC_RespondingCommandHandler)
+    public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
+        val signature = joinPoint.getStaticPart().getSignature();
+        val clazz = signature.getDeclaringTypeName();
 
-		return metrics.timedCommand(clazz, () -> process(joinPoint));
-	}
+        return metrics.timedCommand(clazz, () -> process(joinPoint));
+    }
 
-	@VisibleForTesting
-	protected <C extends Command> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
+    @VisibleForTesting
+    protected <C extends Command> Object process(ProceedingJoinPoint joinPoint) throws CommandHandlingException {
 
-		C cmd = (C) joinPoint.getArgs()[0];
-		ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
+        C cmd = (C) joinPoint.getArgs()[0];
+        ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
 
-		// validator based validate
-		Set<ConstraintViolation<C>> violations = validator.validate(cmd);
-		if (!violations.isEmpty()) {
-			throw new CommandValidationException(violations);
-		}
+        // validator based validate
+        Set<ConstraintViolation<C>> violations = validator.validate(cmd);
+        if (!violations.isEmpty()) {
+            throw new CommandValidationException(violations);
+        }
 
-		// custom validate
-		try {
-			target.validate(cmd);
-		} catch (CommandValidationException e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new CommandValidationException(e);
-		}
+        // custom validate
+        try {
+            target.validate(cmd);
+        } catch (CommandValidationException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new CommandValidationException(e);
+        }
 
-		// verification
-		try {
-			target.verify(cmd);
-		} catch (CommandVerificationException e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new CommandVerificationException(e);
-		}
+        // verification
+        try {
+            target.verify(cmd);
+        } catch (CommandVerificationException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new CommandVerificationException(e);
+        }
 
-		// execution
-		try {
-			val result = joinPoint.proceed();
-			if (result == null) {
-				throw new CommandHandlingException("Response must not be null");
-			}
-			return result;
-		} catch (CommandHandlingException e) {
-			throw e;
-		} catch (Throwable e) {
-			throw new CommandHandlingException(e);
-		}
+        // execution
+        try {
+            val result = joinPoint.proceed();
+            if (result == null) {
+                if (joinPoint.getTarget() instanceof CommandHandler) {
+                    // ok for a void return
+                }
+                else {
+                    throw new CommandHandlingException("Response must not be null");
+                }
+            }
+            return result;
+        } catch (CommandHandlingException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new CommandHandlingException(e);
+        }
 
-	}
+    }
 }
