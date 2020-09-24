@@ -18,8 +18,7 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * A command handler that returns void. Should be used as
- * a default.
+ * A command handler that returns void. Should be used as a default.
  */
 public interface CommandHandler<C extends Command> extends ICommandHandler<C> {
 

@@ -18,10 +18,11 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * A command handler that returns just a token as a response. Should be used if you need an indication token, only.
+ * A command handler that returns just a token as a response. Should be used if
+ * you need an indication token, only.
  */
 public interface TokenCommandHandler<C extends Command> extends ICommandHandler<C> {
 
-    @NonNull
-    CommandTokenResponse handle(@NonNull C cmd) throws CommandHandlingException;
+	@NonNull
+	CommandTokenResponse handle(@NonNull C cmd) throws CommandHandlingException;
 }
