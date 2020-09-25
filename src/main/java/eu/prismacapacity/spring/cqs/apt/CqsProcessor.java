@@ -188,7 +188,7 @@ public class CqsProcessor extends javax.annotation.processing.AbstractProcessor 
 
 				String simpleClassName = type.getQualifiedName().getSimpleName().toString();
 				String targetClassName = className + GENERATED_TYPE_SUFFIX;
-				String targetSimpleClassName = targetClassName.substring(lastDot + 1);
+				String targetSimpleClassName = simpleClassName + GENERATED_TYPE_SUFFIX;
 
 				JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(targetClassName);
 
