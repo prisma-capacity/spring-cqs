@@ -186,7 +186,7 @@ public class CqsProcessor extends javax.annotation.processing.AbstractProcessor 
 					packageName = className.substring(0, lastDot);
 				}
 
-				String simpleClassName = className.substring(lastDot + 1);
+				String simpleClassName = type.getQualifiedName().getSimpleName().toString();
 				String targetClassName = className + GENERATED_TYPE_SUFFIX;
 				String targetSimpleClassName = targetClassName.substring(lastDot + 1);
 
