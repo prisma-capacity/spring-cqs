@@ -42,10 +42,6 @@ public class QueryValidationException extends QueryHandlingException {
 		super(msg, e);
 	}
 
-	public QueryValidationException(@NonNull String msg) {
-		super(msg);
-	}
-
 	public QueryValidationException(@NonNull Throwable e) {
 		super(e);
 	}

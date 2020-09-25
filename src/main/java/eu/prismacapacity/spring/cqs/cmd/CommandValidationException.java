@@ -28,7 +28,7 @@ import eu.prismacapacity.spring.cqs.Violations;
 /**
  * happened while bean validation of the incoming command, or during execution
  * of the validate method of a ({@link RespondingCommandHandler} or
- * {@link CommandHandler}
+ * {@link TokenCommandHandler}
  */
 public class CommandValidationException extends CommandHandlingException {
 	@Getter
@@ -45,9 +45,5 @@ public class CommandValidationException extends CommandHandlingException {
 
 	public CommandValidationException(@NonNull Throwable e) {
 		super(e);
-	}
-
-	public CommandValidationException(@NonNull String msg) {
-		super(msg);
 	}
 }

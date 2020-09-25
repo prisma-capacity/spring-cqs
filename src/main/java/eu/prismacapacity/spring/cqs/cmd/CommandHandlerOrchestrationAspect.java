@@ -89,7 +89,11 @@ public final class CommandHandlerOrchestrationAspect {
 		try {
 			val result = joinPoint.proceed();
 			if (result == null) {
-				throw new CommandHandlingException("Response must not be null");
+				if (joinPoint.getTarget() instanceof CommandHandler) {
+					// ok for a void return
+				} else {
+					throw new CommandHandlingException("Response must not be null");
+				}
 			}
 			return result;
 		} catch (CommandHandlingException e) {

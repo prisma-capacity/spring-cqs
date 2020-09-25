@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 
 import lombok.val;
 
-class CommandValueResponseTest {
+class TokenCommandValueResponseTest {
 
     @Test
     void empty() {

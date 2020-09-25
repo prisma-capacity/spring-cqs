@@ -102,7 +102,7 @@ class CommandHandlerOrchestrationAspectTest {
         private ProceedingJoinPoint joinPoint;
         private FooCommand cmd = new FooCommand() {
         };
-        private CommandHandler<FooCommand> handler = spy(new CommandHandler<FooCommand>() {
+        private TokenCommandHandler<FooCommand> handler = spy(new TokenCommandHandler<FooCommand>() {
             @Override
             public void verify(@NonNull FooCommand cmd) throws CommandVerificationException {
             }
@@ -207,7 +207,7 @@ class CommandHandlerOrchestrationAspectTest {
 
         @Test
         void customValidationFailsNoMapping() throws Throwable {
-            CommandValidationException e=new CommandValidationException(new RuntimeException());
+            CommandValidationException e = new CommandValidationException(new RuntimeException());
             doThrow(e).when(handler).validate(cmd);
             val actual = Assertions.assertThrows(CommandValidationException.class, () -> underTest.process(joinPoint));
             Assertions.assertSame(e, actual);
@@ -216,7 +216,7 @@ class CommandHandlerOrchestrationAspectTest {
         @Test
         void verificationFailsNoMapping() throws Throwable {
 
-            CommandVerificationException e=new CommandVerificationException("",new RuntimeException());
+            CommandVerificationException e = new CommandVerificationException("", new RuntimeException());
             doThrow(e).when(handler).verify(cmd);
 
             val actual = Assertions.assertThrows(CommandVerificationException.class, () -> underTest.process(joinPoint));
@@ -238,6 +238,29 @@ class CommandHandlerOrchestrationAspectTest {
         @Test
         void preventsNullReturn() throws Throwable {
             when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(cmd));
+            when(handler.handle(cmd)).thenReturn(null);
+
+            Assertions.assertThrows(CommandHandlingException.class, () -> underTest.process(joinPoint));
+
+        }
+
+
+        class SimpleCommandHandler implements CommandHandler<SimpleCommand> {
+            @Override
+            public @NonNull void handle(@NonNull SimpleCommand cmd) throws CommandHandlingException {
+            }
+
+            @Override
+            public void verify(@NonNull SimpleCommand cmd) throws CommandVerificationException {
+            }
+        }
+
+        class SimpleCommand implements Command {
+        }
+
+        @Test
+        void allowsVoidReturnFromCommandHandler() throws Throwable {
+            when(joinPoint.getTarget()).thenReturn(new SimpleCommandHandler());
             when(handler.handle(cmd)).thenReturn(null);
 
             Assertions.assertThrows(CommandHandlingException.class, () -> underTest.process(joinPoint));
