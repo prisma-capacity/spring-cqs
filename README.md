@@ -79,3 +79,13 @@ class FooHandler implements QueryHandler<FooQuery, List<FooEntity>> {
 ```
 
 The idea here is (beyond javax.validation), you can quickly see the ins and outs of a use-case, may it be Query or Command, including checking for instance security constraints in a programmatic and technology agnostic way. Also this creates a nice seam between UI/Rest Layer and Domain Model or persistence model in case this is the same for you. If you're interested in checking and maintaing those bounds, have a look at for instance [Archunit](https://www.archunit.org/).
+
+## Migration
+
+#### 1.0 -> 1.1:
+
+In 1.0 `CommandHandler` returned a `CommandTokenResponse`. While this is useful in some cases, the majority of uses could to with a `void` return.
+For this reason, we have a breaking change in 1.1, where `CommandHandler` was renamed to `TokenCommandHandler`, and the new `CommandHandler` now return void.
+
+So please make your CommandHandlers extend `TokenCommandHandler` as a minimal change.
+If you don't use the token, you may want to just return void instead.
