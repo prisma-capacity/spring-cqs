@@ -42,12 +42,13 @@ public final class CommandHandlerOrchestrationAspect {
 
 	private static final String PC_CommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.CommandHandler.handle(..))";
 	private static final String PC_RespondingCommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.RespondingCommandHandler.handle(..))";
+	private static final String PC_TokenCommandHandler = "execution(* eu.prismacapacity.spring.cqs.cmd.TokenCommandHandler.handle(..))";
 
 	protected final Validator validator;
 
 	protected final CommandMetrics metrics;
 
-	@Around(PC_CommandHandler + " || " + PC_RespondingCommandHandler)
+	@Around(PC_CommandHandler + " || " + PC_RespondingCommandHandler+ " || " + PC_TokenCommandHandler)
 	public Object orchestrate(ProceedingJoinPoint joinPoint) throws Throwable {
 		val signature = joinPoint.getStaticPart().getSignature();
 		val clazz = signature.getDeclaringTypeName();
