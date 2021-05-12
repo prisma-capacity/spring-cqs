@@ -52,7 +52,7 @@
     <jackson.version>2.11.1</jackson.version>
     <slf4j.version>1.7.30</slf4j.version>
     <spring-boot.version>2.4.5</spring-boot.version>
-    <spring.version>5.3.6</spring.version>
+    <spring.version>5.3.7</spring.version>
   </properties>
   <dependencies>
     <dependency>
