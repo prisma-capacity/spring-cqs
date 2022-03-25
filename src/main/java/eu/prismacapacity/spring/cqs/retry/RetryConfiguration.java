@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Inherited
-public @interface Retryable {
+public @interface RetryConfiguration {
   int maxAttempts() default 3;
 
   long interval() default 20;

@@ -16,7 +16,7 @@
 package eu.prismacapacity.spring.cqs.query;
 
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
-import eu.prismacapacity.spring.cqs.retry.RetryableUtils;
+import eu.prismacapacity.spring.cqs.retry.RetryUtils;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import javax.validation.ConstraintViolation;
@@ -48,7 +48,7 @@ public final class QueryHandlerOrchestrationAspect {
     return metrics.timedQuery(
         clazz,
         () ->
-            RetryableUtils.withOptionalRetry(
+            RetryUtils.withOptionalRetry(
                 joinPoint.getTarget().getClass(), () -> process(joinPoint)));
   }
 

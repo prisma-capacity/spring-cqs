@@ -18,7 +18,7 @@ package eu.prismacapacity.spring.cqs.cmd;
 import static org.mockito.Mockito.*;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
-import eu.prismacapacity.spring.cqs.retry.Retryable;
+import eu.prismacapacity.spring.cqs.retry.RetryConfiguration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -281,7 +281,7 @@ class CommandHandlerOrchestrationAspectTest {
       public void verify(@NonNull SimpleCommand cmd) throws CommandVerificationException {}
     }
 
-    @Retryable
+    @RetryConfiguration
     class RetrySimpleCommandHandler implements CommandHandler<SimpleCommand> {
       @Override
       public @NonNull void handle(@NonNull SimpleCommand cmd) throws CommandHandlingException {}

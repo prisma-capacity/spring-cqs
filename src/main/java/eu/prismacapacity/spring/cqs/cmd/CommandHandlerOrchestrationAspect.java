@@ -16,7 +16,7 @@
 package eu.prismacapacity.spring.cqs.cmd;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
-import eu.prismacapacity.spring.cqs.retry.RetryableUtils;
+import eu.prismacapacity.spring.cqs.retry.RetryUtils;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -56,7 +56,7 @@ public final class CommandHandlerOrchestrationAspect {
     return metrics.timedCommand(
         clazz,
         () ->
-            RetryableUtils.withOptionalRetry(
+            RetryUtils.withOptionalRetry(
                 joinPoint.getTarget().getClass(), () -> process(joinPoint)));
   }
 

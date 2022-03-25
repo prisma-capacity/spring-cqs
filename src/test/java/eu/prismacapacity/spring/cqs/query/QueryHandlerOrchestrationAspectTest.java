@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
-import eu.prismacapacity.spring.cqs.retry.Retryable;
+import eu.prismacapacity.spring.cqs.retry.RetryConfiguration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -300,7 +300,7 @@ class QueryHandlerOrchestrationAspectTest {
         verify(uut, times(3)).process(joinPoint);
       }
 
-      @Retryable
+      @RetryConfiguration
       class RetryQueryHandler implements QueryHandler<FooQuery, String> {
         @Override
         public void verify(@NonNull FooQuery query) throws QueryVerificationException {}

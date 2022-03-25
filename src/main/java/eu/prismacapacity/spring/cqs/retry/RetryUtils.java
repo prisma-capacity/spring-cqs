@@ -27,11 +27,11 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.retry.support.RetryTemplateBuilder;
 
 @UtilityClass
-public class RetryableUtils {
+public class RetryUtils {
   private static final Map<Class<?>, Optional<RetryTemplate>> CACHE = new ConcurrentHashMap<>();
 
   private Optional<RetryTemplate> from(Class<?> clazz) {
-    return CACHE.computeIfAbsent(clazz, RetryableUtils::getRetryTemplate);
+    return CACHE.computeIfAbsent(clazz, RetryUtils::getRetryTemplate);
   }
 
   @SneakyThrows
@@ -46,7 +46,7 @@ public class RetryableUtils {
   }
 
   Optional<RetryTemplate> getRetryTemplate(Class<?> clazz) {
-    return Optional.ofNullable(clazz.getAnnotation(Retryable.class))
+    return Optional.ofNullable(clazz.getAnnotation(RetryConfiguration.class))
         .map(
             config -> {
               final RetryTemplateBuilder tplBuilder = new RetryTemplateBuilder();

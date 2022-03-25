@@ -18,6 +18,10 @@ package eu.prismacapacity.spring.cqs.retry;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import eu.prismacapacity.spring.cqs.cmd.CommandHandlingException;
+import eu.prismacapacity.spring.cqs.cmd.CommandValidationException;
+import eu.prismacapacity.spring.cqs.query.QueryHandlingException;
+import eu.prismacapacity.spring.cqs.query.QueryValidationException;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class RetryableUtilsTest {
+class RetryUtilsTest {
   @Mock Supplier<String> fn;
   @Mock Supplier<String> fn2;
 
@@ -33,7 +37,7 @@ class RetryableUtilsTest {
   void test_happyCase() {
     when(fn.get()).thenReturn("foo");
 
-    assertEquals("foo", RetryableUtils.withOptionalRetry(RetryWithDefaults.class, fn));
+    assertEquals("foo", RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn));
 
     verify(fn).get();
   }
@@ -43,20 +47,36 @@ class RetryableUtilsTest {
     when(fn.get()).thenThrow(new IllegalStateException());
 
     assertThrows(
-        IllegalStateException.class, () -> RetryableUtils.withOptionalRetry(NoRetries.class, fn));
+        IllegalStateException.class, () -> RetryUtils.withOptionalRetry(NoRetries.class, fn));
 
     verify(fn).get();
   }
 
   @Test
-  void test() {
+  void test_defaults() {
     when(fn.get()).thenThrow(new IllegalStateException());
 
     assertThrows(
         IllegalStateException.class,
-        () -> RetryableUtils.withOptionalRetry(RetryWithDefaults.class, fn));
+        () -> RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn));
 
     verify(fn, times(3)).get();
+  }
+
+  @Test
+  void test_defaults_noRetry() {
+    when(fn.get()).thenThrow(new CommandValidationException("broken", new Throwable()));
+    when(fn2.get()).thenThrow(new QueryValidationException("broken", new Throwable()));
+
+    assertThrows(
+        CommandHandlingException.class,
+        () -> RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn));
+    assertThrows(
+        QueryHandlingException.class,
+        () -> RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn2));
+
+    verify(fn).get();
+    verify(fn2).get();
   }
 
   @Test
@@ -66,10 +86,10 @@ class RetryableUtilsTest {
 
     assertThrows(
         IllegalStateException.class,
-        () -> RetryableUtils.withOptionalRetry(RetryWithCustomConfig.class, fn));
+        () -> RetryUtils.withOptionalRetry(RetryWithCustomConfig.class, fn));
     assertThrows(
         IllegalArgumentException.class,
-        () -> RetryableUtils.withOptionalRetry(RetryWithCustomConfig.class, fn2));
+        () -> RetryUtils.withOptionalRetry(RetryWithCustomConfig.class, fn2));
 
     verify(fn).get();
     verify(fn2, times(2)).get();
@@ -77,10 +97,10 @@ class RetryableUtilsTest {
 
   static class NoRetries {}
 
-  @Retryable
+  @RetryConfiguration
   static class RetryWithDefaults {}
 
-  @Retryable(
+  @RetryConfiguration(
       maxAttempts = 2,
       notRetryOn = {IllegalStateException.class})
   static class RetryWithCustomConfig {}
