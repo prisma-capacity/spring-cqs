@@ -253,7 +253,7 @@ class CommandHandlerOrchestrationAspectTest {
     }
 
     @Test
-    void retry_simple() throws Throwable {
+    void withRetry() throws Throwable {
       final CommandHandlerOrchestrationAspect uut = spy(underTest);
       final RetrySimpleCommandHandler handler2 = new RetrySimpleCommandHandler();
 

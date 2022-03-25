@@ -45,7 +45,7 @@ public class RetryableUtils {
     }
   }
 
-  private Optional<RetryTemplate> getRetryTemplate(Class<?> clazz) {
+  Optional<RetryTemplate> getRetryTemplate(Class<?> clazz) {
     return Optional.ofNullable(clazz.getAnnotation(Retryable.class))
         .map(
             config -> {

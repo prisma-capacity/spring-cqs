@@ -15,6 +15,8 @@
  */
 package eu.prismacapacity.spring.cqs.retry;
 
+import eu.prismacapacity.spring.cqs.cmd.CommandValidationException;
+import eu.prismacapacity.spring.cqs.query.QueryValidationException;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -27,5 +29,7 @@ public @interface Retryable {
 
   long exponentialBackoffMaxInterval() default 0;
 
-  Class<? extends Throwable>[] notRetryOn() default {};
+  Class<? extends Throwable>[] notRetryOn() default {
+    CommandValidationException.class, QueryValidationException.class
+  };
 }
