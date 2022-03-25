@@ -139,7 +139,7 @@ class QueryHandlerOrchestrationAspectTest {
       underTest.orchestrate(joinPoint);
 
       ArgumentCaptor<Supplier<?>> cap = ArgumentCaptor.forClass(Supplier.class);
-      verify(metrics).timedQuery(any(), cap.capture());
+      verify(metrics).timedQuery(any(), anyInt(), cap.capture());
 
       Supplier<?> shouldRunTheProcessMethod = cap.getValue();
       verify(validator, never()).validate(any());
@@ -285,10 +285,10 @@ class QueryHandlerOrchestrationAspectTest {
         val handler = new RetryQueryHandler();
 
         when(joinPoint.getTarget()).thenReturn(handler);
-        when(metrics.timedQuery(any(), any()))
+        when(metrics.timedQuery(any(), anyInt(), any()))
             .thenAnswer(
                 invocationOnMock -> {
-                  final Supplier<?> fn = invocationOnMock.getArgument(1);
+                  final Supplier<?> fn = invocationOnMock.getArgument(2);
 
                   return fn.get();
                 });
@@ -298,6 +298,7 @@ class QueryHandlerOrchestrationAspectTest {
         Assertions.assertThrows(RuntimeException.class, () -> uut.orchestrate(joinPoint));
 
         verify(uut, times(3)).process(joinPoint);
+        verify(metrics, times(3)).timedQuery(any(), anyInt(), any());
       }
 
       @RetryConfiguration

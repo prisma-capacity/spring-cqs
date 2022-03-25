@@ -22,7 +22,7 @@ import eu.prismacapacity.spring.cqs.cmd.CommandHandlingException;
 import eu.prismacapacity.spring.cqs.cmd.CommandValidationException;
 import eu.prismacapacity.spring.cqs.query.QueryHandlingException;
 import eu.prismacapacity.spring.cqs.query.QueryValidationException;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,45 +32,47 @@ import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 @ExtendWith(MockitoExtension.class)
 class RetryUtilsTest {
-  @Mock private Supplier<String> fn;
-  @Mock private Supplier<String> fn2;
+  @Mock private Function<Integer, String> fn;
+  @Mock private Function<Integer, String> fn2;
 
   private LogCaptor logCaptor = LogCaptor.forClass(ExponentialBackOffPolicy.class);
 
   @Test
   void test_happyCase() {
-    when(fn.get()).thenReturn("foo");
+    when(fn.apply(any())).thenReturn("foo");
 
     assertEquals("foo", RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn));
 
-    verify(fn).get();
+    verify(fn).apply(0);
   }
 
   @Test
   void test_noRetry() {
-    when(fn.get()).thenThrow(new IllegalStateException());
+    when(fn.apply(any())).thenThrow(new IllegalStateException());
 
     assertThrows(
         IllegalStateException.class, () -> RetryUtils.withOptionalRetry(NoRetries.class, fn));
 
-    verify(fn).get();
+    verify(fn).apply(0);
   }
 
   @Test
   void test_defaults() {
-    when(fn.get()).thenThrow(new IllegalStateException());
+    when(fn.apply(any())).thenThrow(new IllegalStateException());
 
     assertThrows(
         IllegalStateException.class,
         () -> RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn));
 
-    verify(fn, times(3)).get();
+    verify(fn).apply(0);
+    verify(fn).apply(1);
+    verify(fn).apply(2);
   }
 
   @Test
   void test_defaults_noRetry() {
-    when(fn.get()).thenThrow(new CommandValidationException("broken", new Throwable()));
-    when(fn2.get()).thenThrow(new QueryValidationException("broken", new Throwable()));
+    when(fn.apply(any())).thenThrow(new CommandValidationException("broken", new Throwable()));
+    when(fn2.apply(any())).thenThrow(new QueryValidationException("broken", new Throwable()));
 
     assertThrows(
         CommandHandlingException.class,
@@ -79,14 +81,14 @@ class RetryUtilsTest {
         QueryHandlingException.class,
         () -> RetryUtils.withOptionalRetry(RetryWithDefaults.class, fn2));
 
-    verify(fn).get();
-    verify(fn2).get();
+    verify(fn).apply(0);
+    verify(fn2).apply(0);
   }
 
   @Test
   void test_customConfig() {
-    when(fn.get()).thenThrow(new IllegalStateException());
-    when(fn2.get()).thenThrow(new IllegalArgumentException());
+    when(fn.apply(any())).thenThrow(new IllegalStateException());
+    when(fn2.apply(any())).thenThrow(new IllegalArgumentException());
 
     assertThrows(
         IllegalStateException.class,
@@ -95,19 +97,19 @@ class RetryUtilsTest {
         IllegalArgumentException.class,
         () -> RetryUtils.withOptionalRetry(RetryWithCustomConfig.class, fn2));
 
-    verify(fn).get();
-    verify(fn2, times(2)).get();
+    verify(fn).apply(0);
+    verify(fn2, times(2)).apply(any());
   }
 
   @Test
   void test_backoff() {
-    when(fn.get()).thenThrow(new IllegalStateException());
+    when(fn.apply(any())).thenThrow(new IllegalStateException());
 
     assertThrows(
         IllegalStateException.class,
         () -> RetryUtils.withOptionalRetry(RetryWithBackoff.class, fn));
 
-    verify(fn, times(5)).get();
+    verify(fn, times(5)).apply(any());
 
     assertEquals(4, logCaptor.getDebugLogs().size());
     assertTrue(

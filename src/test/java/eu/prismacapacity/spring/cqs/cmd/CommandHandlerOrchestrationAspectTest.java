@@ -137,7 +137,7 @@ class CommandHandlerOrchestrationAspectTest {
       underTest.orchestrate(joinPoint);
 
       ArgumentCaptor<Supplier<?>> cap = ArgumentCaptor.forClass(Supplier.class);
-      verify(metrics).timedCommand(any(), cap.capture());
+      verify(metrics).timedCommand(any(), anyInt(), cap.capture());
 
       Supplier<?> shouldRunTheProcessMethod = cap.getValue();
       verify(validator, never()).validate(any());
@@ -258,10 +258,10 @@ class CommandHandlerOrchestrationAspectTest {
       final RetrySimpleCommandHandler handler2 = new RetrySimpleCommandHandler();
 
       when(joinPoint.getTarget()).thenReturn(handler2);
-      when(metrics.timedCommand(any(), any()))
+      when(metrics.timedCommand(any(), anyInt(), any()))
           .thenAnswer(
               invocationOnMock -> {
-                final Supplier<?> fn = invocationOnMock.getArgument(1);
+                final Supplier<?> fn = invocationOnMock.getArgument(2);
 
                 return fn.get();
               });
@@ -271,6 +271,7 @@ class CommandHandlerOrchestrationAspectTest {
       Assertions.assertThrows(RuntimeException.class, () -> uut.orchestrate(joinPoint));
 
       verify(uut, times(3)).process(joinPoint);
+      verify(metrics, times(3)).timedCommand(any(), anyInt(), any());
     }
 
     class SimpleCommandHandler implements CommandHandler<SimpleCommand> {

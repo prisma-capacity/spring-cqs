@@ -45,11 +45,9 @@ public final class QueryHandlerOrchestrationAspect {
     val signature = joinPoint.getStaticPart().getSignature();
     val clazz = signature.getDeclaringTypeName();
 
-    return metrics.timedQuery(
-        clazz,
-        () ->
-            RetryUtils.withOptionalRetry(
-                joinPoint.getTarget().getClass(), () -> process(joinPoint)));
+    return RetryUtils.withOptionalRetry(
+        joinPoint.getTarget().getClass(),
+        (count) -> metrics.timedQuery(clazz, count, () -> process(joinPoint)));
   }
 
   protected <Q extends Query> Object process(ProceedingJoinPoint joinPoint)

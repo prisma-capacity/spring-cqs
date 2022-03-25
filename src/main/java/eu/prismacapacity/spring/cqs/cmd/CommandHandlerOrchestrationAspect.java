@@ -53,11 +53,9 @@ public final class CommandHandlerOrchestrationAspect {
     val signature = joinPoint.getStaticPart().getSignature();
     val clazz = signature.getDeclaringTypeName();
 
-    return metrics.timedCommand(
-        clazz,
-        () ->
-            RetryUtils.withOptionalRetry(
-                joinPoint.getTarget().getClass(), () -> process(joinPoint)));
+    return RetryUtils.withOptionalRetry(
+        joinPoint.getTarget().getClass(),
+        (count) -> metrics.timedCommand(clazz, count, () -> process(joinPoint)));
   }
 
   @VisibleForTesting

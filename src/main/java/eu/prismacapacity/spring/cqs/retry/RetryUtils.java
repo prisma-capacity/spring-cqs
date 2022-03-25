@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.retry.RetryCallback;
@@ -35,13 +35,16 @@ public class RetryUtils {
   }
 
   @SneakyThrows
-  public <R> R withOptionalRetry(Class<?> handler, Supplier<R> fn) {
+  public <R> R withOptionalRetry(Class<?> handler, Function<Integer, R> fn) {
     final Optional<RetryTemplate> template = from(handler);
 
     if (template.isPresent()) {
-      return template.get().execute((RetryCallback<R, Throwable>) retryContext -> fn.get());
+      return template
+          .get()
+          .execute(
+              (RetryCallback<R, Throwable>) retryContext -> fn.apply(retryContext.getRetryCount()));
     } else {
-      return fn.get();
+      return fn.apply(0);
     }
   }
 
