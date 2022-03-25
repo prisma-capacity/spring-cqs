@@ -30,6 +30,15 @@ class RetryableUtilsTest {
   @Mock Supplier<String> fn2;
 
   @Test
+  void test_happyCase() {
+    when(fn.get()).thenReturn("foo");
+
+    assertEquals("foo", RetryableUtils.withOptionalRetry(RetryWithDefaults.class, fn));
+
+    verify(fn).get();
+  }
+
+  @Test
   void test_noRetry() {
     when(fn.get()).thenThrow(new IllegalStateException());
 
