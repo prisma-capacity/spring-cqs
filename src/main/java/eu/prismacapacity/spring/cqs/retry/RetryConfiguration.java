@@ -23,12 +23,19 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Inherited
 public @interface RetryConfiguration {
+  /** Limits maximum number of attempts to provided value. */
   int maxAttempts() default 3;
 
+  /**
+   * Either the interval for a fixed backoff or the start interval if exponential backoff is
+   * configured.
+   */
   long interval() default 20;
 
+  /** Enables exponential backoff by setting the max interval. */
   long exponentialBackoffMaxInterval() default 0;
 
+  /** Configures a list of throwables where no retry will be executed. */
   Class<? extends Throwable>[] notRetryOn() default {
     CommandValidationException.class, QueryValidationException.class
   };
