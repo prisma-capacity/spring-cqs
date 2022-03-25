@@ -101,6 +101,7 @@ By default, it will retry 3 times in intervals of 20ms for every exception that 
 type `QueryValidationException` or `CommandValidationException`. You can also configure an exponential backoff if desired. 
 Please have a look at [RetryConfiguration.java](src/main/java/eu/prismacapacity/spring/cqs/retry/RetryConfiguration.java) for all available options.
 
+
 ## Migration
 
 #### 1.0 -> 1.1:
