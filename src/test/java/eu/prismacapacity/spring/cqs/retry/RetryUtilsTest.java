@@ -23,15 +23,19 @@ import eu.prismacapacity.spring.cqs.cmd.CommandValidationException;
 import eu.prismacapacity.spring.cqs.query.QueryHandlingException;
 import eu.prismacapacity.spring.cqs.query.QueryValidationException;
 import java.util.function.Supplier;
+import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 @ExtendWith(MockitoExtension.class)
 class RetryUtilsTest {
-  @Mock Supplier<String> fn;
-  @Mock Supplier<String> fn2;
+  @Mock private Supplier<String> fn;
+  @Mock private Supplier<String> fn2;
+
+  private LogCaptor logCaptor = LogCaptor.forClass(ExponentialBackOffPolicy.class);
 
   @Test
   void test_happyCase() {
@@ -80,7 +84,7 @@ class RetryUtilsTest {
   }
 
   @Test
-  void testCustomConfig() {
+  void test_customConfig() {
     when(fn.get()).thenThrow(new IllegalStateException());
     when(fn2.get()).thenThrow(new IllegalArgumentException());
 
@@ -95,6 +99,29 @@ class RetryUtilsTest {
     verify(fn2, times(2)).get();
   }
 
+  @Test
+  void test_backoff() {
+    when(fn.get()).thenThrow(new IllegalStateException());
+
+    assertThrows(
+        IllegalStateException.class,
+        () -> RetryUtils.withOptionalRetry(RetryWithBackoff.class, fn));
+
+    verify(fn, times(5)).get();
+
+    assertEquals(4, logCaptor.getDebugLogs().size());
+    assertTrue(
+        logCaptor
+            .getDebugLogs()
+            .contains("Sleeping for 20")); // first retry with default interval of 20
+    assertTrue(logCaptor.getDebugLogs().contains("Sleeping for 24")); // interval*1.2
+    assertEquals(
+        2L,
+        logCaptor.getDebugLogs().stream()
+            .filter(x -> x.equals("Sleeping for 25"))
+            .count()); // maxInterval
+  }
+
   static class NoRetries {}
 
   @RetryConfiguration
@@ -104,4 +131,7 @@ class RetryUtilsTest {
       maxAttempts = 2,
       notRetryOn = {IllegalStateException.class})
   static class RetryWithCustomConfig {}
+
+  @RetryConfiguration(maxAttempts = 5, exponentialBackoffMaxInterval = 25)
+  static class RetryWithBackoff {}
 }
