@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2022 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package eu.prismacapacity.spring.cqs.metrics;
 import java.util.function.Supplier;
 
 public interface QueryMetrics {
-	<T> T timedQuery(String queryHandlerClass, Supplier<T> fn);
-	void logTimeout();
+  <T> T timedQuery(String queryHandlerClass, int retryCount, Supplier<T> fn);
+
+  void logTimeout();
 }

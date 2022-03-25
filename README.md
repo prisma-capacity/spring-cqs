@@ -11,23 +11,31 @@ Simple abstractions we use to follow the CQS Principle in applications.
 [![codecov](https://codecov.io/gh/prisma-capacity/spring-cqs/branch/master/graph/badge.svg)](https://codecov.io/gh/prisma-capacity/spring-cqs)
 [![MavenCentral](https://img.shields.io/maven-central/v/eu.prismacapacity/spring-cqs)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22eu.prismacapacity%22)
 <a href="https://www.apache.org/licenses/LICENSE-2.0">
-    <img class="inline" src="https://img.shields.io/badge/license-ASL2-green.svg?style=flat">
+<img class="inline" src="https://img.shields.io/badge/license-ASL2-green.svg?style=flat">
 </a>
 
 ### Motivation
 
-The [CQS Principle](https://en.wikipedia.org/wiki/Command–query_separation) states that "every method should either be a command that performs an action, or a query that returns data to the caller, but not both." in order to reduce side-effects.
+The [CQS Principle](https://en.wikipedia.org/wiki/Command–query_separation) states that "every method should either be a
+command that performs an action, or a query that returns data to the caller, but not both." in order to reduce
+side-effects.
 
-In our projects we use abstractions like Query & QueryHandler as well as Command & CommandHandler to follow this principle. However, there is a bit of fineprint here that makes it worthwhile to reuse this in form of a library:
+In our projects we use abstractions like Query & QueryHandler as well as Command & CommandHandler to follow this
+principle. However, there is a bit of fineprint here that makes it worthwhile to reuse this in form of a library:
 
-* a command / a query needs to be valid (as in java.validation valid), otherwise a Command/Query-ValidationExcption will be thrown
-* a command / a query needs to be valid (determined by an optional message on the handler), otherwise a Command/Query-ValidationExcption will be thrown
-* a command / a query needs to be verified by a mandatory method in the handler the is expected to throw a Command/Query-VerificationException 
+* a command / a query needs to be valid (as in java.validation valid), otherwise a Command/Query-ValidationExcption will
+  be thrown
+* a command / a query needs to be valid (determined by an optional message on the handler), otherwise a
+  Command/Query-ValidationExcption will be thrown
+* a command / a query needs to be verified by a mandatory method in the handler the is expected to throw a
+  Command/Query-VerificationException
 * when a command / a query is handled, any exception it may throw is to be wrapped in a Command/Query-Handling Exception
 
-In order to accomplish that, this kind of orchestration is done by an aspect, in order to get this out of that way when following the call stack in your IDE.
+In order to accomplish that, this kind of orchestration is done by an aspect, in order to get this out of that way when
+following the call stack in your IDE.
 
-This has pros and cons and might be a debatable use of aspects, but we decided that this is the best solution for our context. You know, it depends...
+This has pros and cons and might be a debatable use of aspects, but we decided that this is the best solution for our
+context. You know, it depends...
 
 ### Usage
 
@@ -49,7 +57,9 @@ The only thing you might want to configure is how Cqs uses Metrics. See @CqsConf
 
 #### Example
 
-Let's say, you have a Foo Entity and a corresponding repository. What we do with this lib is to encapsulate use-cases in a UI-agnosic manner. 
+Let's say, you have a Foo Entity and a corresponding repository. What we do with this lib is to encapsulate use-cases in
+a UI-agnosic manner.
+
 ```java
 class FooEntity {
 }
@@ -57,7 +67,7 @@ class FooEntity {
 class FooQuery implements Query {
     @NotNull
     UUID idToLookFor;
-    
+
     @NotNull
     Long userIdOfRequestingUser;
 }
@@ -78,14 +88,27 @@ class FooHandler implements QueryHandler<FooQuery, List<FooEntity>> {
 }
 ```
 
-The idea here is (beyond javax.validation), you can quickly see the ins and outs of a use-case, may it be Query or Command, including checking for instance security constraints in a programmatic and technology agnostic way. Also this creates a nice seam between UI/Rest Layer and Domain Model or persistence model in case this is the same for you. If you're interested in checking and maintaing those bounds, have a look at for instance [Archunit](https://www.archunit.org/).
+The idea here is (beyond javax.validation), you can quickly see the ins and outs of a use-case, may it be Query or
+Command, including checking for instance security constraints in a programmatic and technology agnostic way. Also this
+creates a nice seam between UI/Rest Layer and Domain Model or persistence model in case this is the same for you. If
+you're interested in checking and maintaing those bounds, have a look at for
+instance [Archunit](https://www.archunit.org/).
+
+#### Configure a retry behaviour for Command and Query handlers
+
+If you want you can configure a retry behaviour for your handlers by adding `@RetryConfiguration` to the handler class.
+By default, it will retry 3 times in intervals of 20ms for every exception that is not of
+type `QueryValidationException` or `CommandValidationException`. You can also configure an exponential backoff if desired. 
+Please have a look at [RetryConfiguration.java](src/main/java/eu/prismacapacity/spring/cqs/retry/RetryConfiguration.java) for all available options.
+
 
 ## Migration
 
 #### 1.0 -> 1.1:
 
-In 1.0 `CommandHandler` returned a `CommandTokenResponse`. While this is useful in some cases, the majority of uses could to with a `void` return.
-For this reason, we have a breaking change in 1.1, where `CommandHandler` was renamed to `TokenCommandHandler`, and the new `CommandHandler` now return void.
+In 1.0 `CommandHandler` returned a `CommandTokenResponse`. While this is useful in some cases, the majority of uses
+could to with a `void` return. For this reason, we have a breaking change in 1.1, where `CommandHandler` was renamed
+to `TokenCommandHandler`, and the new `CommandHandler` now return void.
 
-So please make your CommandHandlers extend `TokenCommandHandler` as a minimal change.
-If you don't use the token, you may want to just return void instead.
+So please make your CommandHandlers extend `TokenCommandHandler` as a minimal change. If you don't use the token, you
+may want to just return void instead.
