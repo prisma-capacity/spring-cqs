@@ -6,9 +6,12 @@
         <notes>3 false posiitives regarding the spring RCE CVE, that do not apply due to overridden spring deps</notes>
         <filePath regex="true">.*\bspring-[hateoas|plugin\-core|retry].*\b</filePath>
         <cve>CVE-2022-22965</cve>
-        <cve>CVE-2016-1000027</cve>
     </suppress>
 
+    <suppress>
+        <notes>Deserialization issue that spring cannot fix. No mitigation before spring 6</notes>
+        <cve>CVE-2016-1000027</cve>
+    </suppress>
 
 </suppressions>
 
