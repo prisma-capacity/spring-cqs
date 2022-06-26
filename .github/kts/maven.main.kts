@@ -5,6 +5,7 @@
 import it.krzeminski.githubactions.actions.actions.CacheV2
 import it.krzeminski.githubactions.actions.actions.CacheV3
 import it.krzeminski.githubactions.actions.actions.CheckoutV2
+import it.krzeminski.githubactions.actions.actions.CheckoutV3
 import it.krzeminski.githubactions.actions.actions.SetupJavaV3
 import it.krzeminski.githubactions.actions.codecov.CodecovActionV3
 import it.krzeminski.githubactions.domain.RunnerType
@@ -28,8 +29,8 @@ public val workflowMaven: Workflow = workflow(
         runsOn = RunnerType.UbuntuLatest,
       ) {
         uses(
-          name = "CheckoutV2",
-          action = CheckoutV2(),
+          name = "Checkout",
+          action = CheckoutV3(),
         )
         uses(
           name = "Cache",
