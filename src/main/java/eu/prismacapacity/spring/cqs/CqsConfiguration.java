@@ -15,7 +15,7 @@
  */
 package eu.prismacapacity.spring.cqs;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
