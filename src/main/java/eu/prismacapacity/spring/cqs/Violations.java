@@ -18,7 +18,7 @@ package eu.prismacapacity.spring.cqs;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import lombok.NonNull;
 

@@ -88,7 +88,7 @@ class FooHandler implements QueryHandler<FooQuery, List<FooEntity>> {
 }
 ```
 
-The idea here is (beyond javax.validation), you can quickly see the ins and outs of a use-case, may it be Query or
+The idea here is (beyond jakarta.validation), you can quickly see the ins and outs of a use-case, may it be Query or
 Command, including checking for instance security constraints in a programmatic and technology agnostic way. Also this
 creates a nice seam between UI/Rest Layer and Domain Model or persistence model in case this is the same for you. If
 you're interested in checking and maintaing those bounds, have a look at for
