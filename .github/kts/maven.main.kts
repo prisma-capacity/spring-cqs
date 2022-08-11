@@ -1,21 +1,17 @@
 #!/usr/bin/env kotlin
 
-@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.20.0")
+@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.24.0")
 
-import it.krzeminski.githubactions.actions.actions.CacheV2
 import it.krzeminski.githubactions.actions.actions.CacheV3
-import it.krzeminski.githubactions.actions.actions.CheckoutV2
 import it.krzeminski.githubactions.actions.actions.CheckoutV3
 import it.krzeminski.githubactions.actions.actions.SetupJavaV3
 import it.krzeminski.githubactions.actions.codecov.CodecovActionV3
 import it.krzeminski.githubactions.domain.RunnerType
 import it.krzeminski.githubactions.domain.Workflow
 import it.krzeminski.githubactions.domain.triggers.Push
-import it.krzeminski.githubactions.dsl.expr
 import it.krzeminski.githubactions.dsl.workflow
-import it.krzeminski.githubactions.yaml.toYaml
 import it.krzeminski.githubactions.yaml.writeToFile
-import java.nio.`file`.Paths
+import java.nio.file.Paths
 
 public val workflowMaven: Workflow = workflow(
       name = "Java CI",
