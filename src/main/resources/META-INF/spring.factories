@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-eu.prismacapacity.spring.cqs.CqsConfiguration
