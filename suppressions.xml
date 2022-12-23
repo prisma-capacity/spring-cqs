@@ -13,5 +13,16 @@
         <cve>CVE-2016-1000027</cve>
     </suppress>
 
+    <suppress>
+        <notes>Snakeyaml deserialization issue that spring cannot fix.</notes>
+        <cve>CVE-2022-1471</cve>
+        <cve>CVE-2022-25857</cve>
+        <cve>CVE-2022-38749</cve>
+        <cve>CVE-2022-38751</cve>
+        <cve>CVE-2022-38752</cve>
+        <cve>CVE-2022-41854</cve>
+        <cve>CVE-2022-38750</cve>
+    </suppress>
+
 </suppressions>
 
