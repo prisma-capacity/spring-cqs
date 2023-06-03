@@ -62,7 +62,6 @@ public val workflowMaven: Workflow = workflow(
           ),
         )
       }
-
     }
 
 workflowMaven.writeToFile()
