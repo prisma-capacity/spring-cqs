@@ -16,6 +16,7 @@ import io.github.typesafegithub.workflows.yaml.writeToFile
 import java.nio.file.Paths
 
 public val workflowMaven: Workflow = workflow(
+
       name = "Java CI",
       on = listOf(
         Push(),
