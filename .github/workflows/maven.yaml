@@ -1,4 +1,4 @@
-# This file was generated using Kotlin DSL (maven.main.kts).
+# This file was generated using Kotlin DSL (.github/kts/maven.main.kts).
 # If you want to modify the workflow, please change the Kotlin file and regenerate this YAML file.
 # Generated with https://github.com/typesafegithub/github-workflows-kt
 
@@ -15,7 +15,7 @@ jobs:
       uses: 'actions/checkout@v3'
     - id: 'step-1'
       name: 'Execute script'
-      run: 'rm ''.github/workflows/maven.yaml'' && ''maven.main.kts'''
+      run: 'rm ''.github/workflows/maven.yaml'' && ''.github/kts/maven.main.kts'''
     - id: 'step-2'
       name: 'Consistency check'
       run: 'git diff --exit-code ''.github/workflows/maven.yaml'''
