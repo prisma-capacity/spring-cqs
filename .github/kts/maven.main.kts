@@ -1,5 +1,5 @@
 #!/usr/bin/env kotlin
-
+//
 @file:DependsOn("io.github.typesafegithub:github-workflows-kt:0.42.0")
 
 
@@ -65,4 +65,4 @@ public val workflowMaven: Workflow = workflow(
 
     }
 
-workflowMaven.writeToFile(addConsistencyCheck = false)
+workflowMaven.writeToFile()
