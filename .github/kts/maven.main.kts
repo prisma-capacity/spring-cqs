@@ -56,8 +56,7 @@ public val workflowMaven: Workflow = workflow(
         uses(
           name = "CodecovActionV3",
           action = CodecovActionV3(
-            token = "${'$'}{{ secrets.CODECOV_TOKEN }}",
-            _customVersion = "v1",
+            token = "${'$'}{{ secrets.CODECOV_TOKEN }}"
           ),
         )
       }
