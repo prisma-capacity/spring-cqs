@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+PREFIX="> pre-commit [$(basename $0)]\t\t"
+
+if git diff-index --name-only HEAD | grep .github/kts | grep -q ".kts"; then
+
+  echo -e "$PREFIX regenerating workflow files"
+
+  for i in $(find .github/kts/. -type f | grep ".kts" | grep -v "~"); do
+    $i
+  done
+
+  echo -e "$PREFIX adding changes to index"
+  git add .github/workflows
+
+fi

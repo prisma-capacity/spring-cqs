@@ -1,24 +1,27 @@
 #!/usr/bin/env kotlin
+//
+@file:DependsOn("io.github.typesafegithub:github-workflows-kt:0.42.0")
 
-@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.40.0")
 
-import it.krzeminski.githubactions.actions.actions.CacheV3
-import it.krzeminski.githubactions.actions.actions.CheckoutV3
-import it.krzeminski.githubactions.actions.actions.SetupJavaV3
-import it.krzeminski.githubactions.actions.codecov.CodecovActionV3
-import it.krzeminski.githubactions.domain.RunnerType
-import it.krzeminski.githubactions.domain.Workflow
-import it.krzeminski.githubactions.domain.triggers.Push
-import it.krzeminski.githubactions.dsl.workflow
-import it.krzeminski.githubactions.yaml.writeToFile
+
+import io.github.typesafegithub.workflows.actions.actions.CacheV3
+import io.github.typesafegithub.workflows.actions.actions.CheckoutV3
+import io.github.typesafegithub.workflows.actions.actions.SetupJavaV3
+import io.github.typesafegithub.workflows.actions.codecov.CodecovActionV3
+import io.github.typesafegithub.workflows.domain.RunnerType
+import io.github.typesafegithub.workflows.domain.Workflow
+import io.github.typesafegithub.workflows.domain.triggers.Push
+import io.github.typesafegithub.workflows.dsl.workflow
+import io.github.typesafegithub.workflows.yaml.writeToFile
 import java.nio.file.Paths
 
 public val workflowMaven: Workflow = workflow(
-      name = "Java CI",
+
+      name = "Java/Maven build",
       on = listOf(
         Push(),
         ),
-      sourceFile = Paths.get(".github/kts/maven.main.kts"),
+        sourceFile = Paths.get(".github/kts/maven.main.kts"),
     ) {
       job(
         id = "build",
@@ -56,12 +59,10 @@ public val workflowMaven: Workflow = workflow(
         uses(
           name = "CodecovActionV3",
           action = CodecovActionV3(
-            token = "${'$'}{{ secrets.CODECOV_TOKEN }}",
-            _customVersion = "v1",
+            token = "${'$'}{{ secrets.CODECOV_TOKEN }}"
           ),
         )
       }
-
     }
 
 workflowMaven.writeToFile()
