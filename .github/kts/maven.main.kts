@@ -17,7 +17,7 @@ import java.nio.file.Paths
 
 public val workflowMaven: Workflow = workflow(
 
-      name = "Java CI",
+      name = "Java/Maven build",
       on = listOf(
         Push(),
         ),
