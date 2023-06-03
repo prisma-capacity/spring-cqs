@@ -20,7 +20,7 @@ public val workflowMaven: Workflow = workflow(
       on = listOf(
         Push(),
         ),
-      sourceFile = Paths.get("maven.main.kts"),
+        sourceFile = Paths.get("maven.main.kts"),
     ) {
       job(
         id = "build",
@@ -65,4 +65,4 @@ public val workflowMaven: Workflow = workflow(
 
     }
 
-workflowMaven.writeToFile()
+workflowMaven.writeToFile(addConsistencyCheck = false)
