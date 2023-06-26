@@ -1,6 +1,6 @@
 #!/usr/bin/env kotlin
 //
-@file:DependsOn("io.github.typesafegithub:github-workflows-kt:0.44.0")
+@file:DependsOn("io.github.typesafegithub:github-workflows-kt:0.46.0")
 
 
 
