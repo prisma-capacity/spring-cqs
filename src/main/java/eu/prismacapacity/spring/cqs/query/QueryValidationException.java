@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,31 @@
  */
 package eu.prismacapacity.spring.cqs.query;
 
+import eu.prismacapacity.spring.cqs.Violations;
+import jakarta.validation.ConstraintViolation;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-
 import lombok.Getter;
 import lombok.NonNull;
 
-import eu.prismacapacity.spring.cqs.Violations;
-
 /**
- * happened while bean validation of the incoming command, or during execution
- * of the validate method of a ({@link QueryHandler}
+ * happened while bean validation of the incoming command, or during execution of the validate
+ * method of a ({@link QueryHandler}
  */
 public class QueryValidationException extends QueryHandlingException {
-	@Getter
-	private Set<? extends ConstraintViolation<? extends Query>> violations = new HashSet<>();
+  @Getter private Set<? extends ConstraintViolation<? extends Query>> violations = new HashSet<>();
 
-	public QueryValidationException(@NonNull Set<? extends ConstraintViolation<? extends Query>> violations) {
-		super(Violations.render(violations));
-		this.violations = violations;
-	}
+  public QueryValidationException(
+      @NonNull Set<? extends ConstraintViolation<? extends Query>> violations) {
+    super(Violations.render(violations));
+    this.violations = violations;
+  }
 
-	public QueryValidationException(@NonNull String msg, @NonNull Throwable e) {
-		super(msg, e);
-	}
+  public QueryValidationException(@NonNull String msg, @NonNull Throwable e) {
+    super(msg, e);
+  }
 
-	public QueryValidationException(@NonNull Throwable e) {
-		super(e);
-	}
+  public QueryValidationException(@NonNull Throwable e) {
+    super(e);
+  }
 }

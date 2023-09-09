@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 import eu.prismacapacity.spring.cqs.retry.RetryUtils;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.aspectj.lang.ProceedingJoinPoint;

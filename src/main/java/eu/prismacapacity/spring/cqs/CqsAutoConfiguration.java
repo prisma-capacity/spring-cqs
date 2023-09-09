@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2022 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import eu.prismacapacity.spring.cqs.metrics.CqsMetrics;
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
 import eu.prismacapacity.spring.cqs.query.QueryHandlerOrchestrationAspect;
 import io.micrometer.core.instrument.MeterRegistry;
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

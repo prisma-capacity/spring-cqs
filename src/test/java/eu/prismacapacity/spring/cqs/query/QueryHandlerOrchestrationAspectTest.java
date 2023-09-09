@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2022-2023 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import static org.mockito.Mockito.*;
 
 import eu.prismacapacity.spring.cqs.metrics.QueryMetrics;
 import eu.prismacapacity.spring.cqs.retry.RetryConfiguration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path;
+import jakarta.validation.Validator;
+import jakarta.validation.metadata.ConstraintDescriptor;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.Validator;
-import javax.validation.metadata.ConstraintDescriptor;
 import lombok.NonNull;
 import lombok.val;
 import org.aspectj.lang.ProceedingJoinPoint;
