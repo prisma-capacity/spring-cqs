@@ -37,7 +37,8 @@ public class CqsIntegrationTest {
 
     @Test
     void shouldVThrow() {
-      Assertions.assertThatThrownBy(() -> myTestQueryHandler.handle(new MyTestQuery(0)))
+      final MyTestQuery query = new MyTestQuery(0);
+      Assertions.assertThatThrownBy(() -> myTestQueryHandler.handle(query))
           .isInstanceOf(QueryValidationException.class);
     }
   }
@@ -51,7 +52,8 @@ public class CqsIntegrationTest {
 
     @Test
     void shouldVThrow() {
-      Assertions.assertThatThrownBy(() -> myTestCommandHandler.handle(new MyTestCommand(0)))
+      final MyTestCommand query = new MyTestCommand(0);
+      Assertions.assertThatThrownBy(() -> myTestCommandHandler.handle(query))
           .isInstanceOf(CommandValidationException.class);
     }
   }
