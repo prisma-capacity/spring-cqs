@@ -51,6 +51,13 @@ This is meant to be used with Spring Boot. In order to get this running just add
     </dependency>
 ````
 
+#### Spring Boot Compatibility
+
+| Library version | Spring Boot version |
+|-----------------|---------------------|
+| 2.x.x           | 2.7+                |
+| 3.x.x           | 3.1+                |
+
 #### Configuration
 
 The only thing you might want to configure is how Cqs uses Metrics. See @CqsConfiguration for details.
@@ -98,9 +105,11 @@ instance [Archunit](https://www.archunit.org/).
 
 If you want you can configure a retry behaviour for your handlers by adding `@RetryConfiguration` to the handler class.
 By default, it will retry 3 times in intervals of 20ms for every exception that is not of
-type `QueryValidationException` or `CommandValidationException`. You can also configure an exponential backoff if desired. 
-Please have a look at [RetryConfiguration.java](src/main/java/eu/prismacapacity/spring/cqs/retry/RetryConfiguration.java) for all available options.
-
+type `QueryValidationException` or `CommandValidationException`. You can also configure an exponential backoff if
+desired.
+Please have a look
+at [RetryConfiguration.java](src/main/java/eu/prismacapacity/spring/cqs/retry/RetryConfiguration.java) for all available
+options.
 
 ## Migration
 
