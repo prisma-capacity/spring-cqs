@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2023 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.spring.cqs;
+package eu.prismacapacity.spring.cqs.itest;
 
-import jakarta.validation.ConstraintViolation;
-import java.util.Set;
-import java.util.stream.Collectors;
-import lombok.NonNull;
+import eu.prismacapacity.spring.cqs.cmd.Command;
+import jakarta.validation.constraints.Min;
+import lombok.Value;
 
-/** can render Violations to a string for logging */
-public class Violations {
-  private Violations() {}
-
-  public static String render(@NonNull Set<? extends ConstraintViolation<?>> violations) {
-    return violations.stream()
-        .map(ConstraintViolation::getMessage)
-        .collect(Collectors.joining("\n"));
-  }
+@Value
+class MyTestCommand implements Command {
+  @Min(1)
+  Integer age;
 }

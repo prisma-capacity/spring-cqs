@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,32 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
+import eu.prismacapacity.spring.cqs.Violations;
+import jakarta.validation.ConstraintViolation;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-
 import lombok.Getter;
 import lombok.NonNull;
 
-import eu.prismacapacity.spring.cqs.Violations;
-
 /**
- * happened while bean validation of the incoming command, or during execution
- * of the validate method of a ({@link RespondingCommandHandler} or
- * {@link TokenCommandHandler}
+ * happened while bean validation of the incoming command, or during execution of the validate
+ * method of a ({@link RespondingCommandHandler} or {@link TokenCommandHandler}
  */
 public class CommandValidationException extends CommandHandlingException {
-	@Getter
-	private Set<? extends ConstraintViolation<? extends Command>> violations = new HashSet<>();
+  @Getter
+  private Set<? extends ConstraintViolation<? extends Command>> violations = new HashSet<>();
 
-	public CommandValidationException(@NonNull Set<? extends ConstraintViolation<? extends Command>> violations) {
-		super(Violations.render(violations));
-		this.violations = violations;
-	}
+  public CommandValidationException(
+      @NonNull Set<? extends ConstraintViolation<? extends Command>> violations) {
+    super(Violations.render(violations));
+    this.violations = violations;
+  }
 
-	public CommandValidationException(@NonNull String msg, @NonNull Throwable e) {
-		super(msg, e);
-	}
+  public CommandValidationException(@NonNull String msg, @NonNull Throwable e) {
+    super(msg, e);
+  }
 
-	public CommandValidationException(@NonNull Throwable e) {
-		super(e);
-	}
+  public CommandValidationException(@NonNull Throwable e) {
+    super(e);
+  }
 }
