@@ -116,7 +116,7 @@ options.
 #### 1.0 -> 1.1:
 
 In 1.0 `CommandHandler` returned a `CommandTokenResponse`. While this is useful in some cases, the majority of uses
-could to with a `void` return. For this reason, we have a breaking change in 1.1, where `CommandHandler` was renamed
+could go with a `void` return. For this reason, we have a breaking change in 1.1, where `CommandHandler` was renamed
 to `TokenCommandHandler`, and the new `CommandHandler` now return void.
 
 So please make your CommandHandlers extend `TokenCommandHandler` as a minimal change. If you don't use the token, you
