@@ -111,6 +111,12 @@ Please have a look
 at [RetryConfiguration.java](src/main/java/eu/prismacapacity/spring/cqs/retry/RetryConfiguration.java) for all available
 options.
 
+#### Tips for use
+
+* Create one handler per use-case.
+* Do not call other handlers inside of yours. If that leads to code duplication, consider refactoring common code into a service that will be used by the two handlers.
+
+
 ## Migration
 
 #### 1.0 -> 1.1:
