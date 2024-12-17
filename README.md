@@ -56,7 +56,8 @@ This is meant to be used with Spring Boot. In order to get this running just add
 | Library version | Spring Boot version |
 |-----------------|---------------------|
 | 2.x.x           | 2.7+                |
-| 3.x.x           | 3.1+                |
+| 3.x.x           | 3.1+                |   
+
 
 #### Configuration
 
@@ -111,7 +112,7 @@ Please have a look
 at [RetryConfiguration.java](src/main/java/eu/prismacapacity/spring/cqs/retry/RetryConfiguration.java) for all available
 options.
 
-#### Mandatory Logging of Command Execution (since version 1.2)
+#### Mandatory Logging of Command Execution (since version 3.1)
 
 Commands have the potential to alter the state of the system (in contrast to queries, which should not). This is why 
 it makes sense to log attempted command executions (regardless of their outcome, may it be success or any kind of 

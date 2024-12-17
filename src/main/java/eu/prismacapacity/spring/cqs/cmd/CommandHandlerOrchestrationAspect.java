@@ -22,6 +22,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -37,6 +38,7 @@ import org.slf4j.spi.*;
 @Aspect
 @SuppressWarnings({"unchecked", "java:S1141"})
 @RequiredArgsConstructor
+@Slf4j
 public final class CommandHandlerOrchestrationAspect {
 
   private static final String PC_CommandHandler =
@@ -67,9 +69,16 @@ public final class CommandHandlerOrchestrationAspect {
 
     C cmd = (C) joinPoint.getArgs()[0];
     ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
-    // happens before executing, so that possible modifications are not reflected
-    String renderedCommand = cmd.toLogString();
-
+    String renderedCommand;
+    try {
+      // happens before executing, so that possible modifications are not reflected
+      renderedCommand = cmd.toLogString();
+    } catch (Throwable e) {
+      log.warn(
+          "A command of {} failed to render for logging. This is a bug, please report to https://github.com/prisma-capacity/spring-cqs/issues . Command execution is not impaired, though.",
+          cmd.getClass());
+      renderedCommand = cmd.getClass().getName() + "( failed to render )";
+    }
     // validator based validate
     Set<ConstraintViolation<C>> violations = validator.validate(cmd);
     if (!violations.isEmpty()) {
@@ -112,7 +121,8 @@ public final class CommandHandlerOrchestrationAspect {
   private void logAndThrow(
       @NonNull ICommandHandler<?> handler,
       @NonNull String renderedCommand,
-      @NonNull RuntimeException e) {
+      @NonNull RuntimeException e)
+      throws RuntimeException {
     DefaultLoggingEventBuilder builder =
         new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.WARN);
     builder.setMessage("Failed to execute.");
