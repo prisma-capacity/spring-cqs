@@ -33,12 +33,13 @@ public class LogRenderer {
   private static final String CLOSE = ")";
   private static final String DELIMITER = ", ";
 
-  private static final CircularDependencyBreaker cdb = new CircularDependencyBreaker();
+  private static final AlreadyVisitedObjectsHolder visitedHolder =
+      new AlreadyVisitedObjectsHolder();
 
   public String renderDefault(@NonNull Object object) {
-    boolean initialized = cdb.initialize();
+    boolean initialized = visitedHolder.initialize();
     try {
-      cdb.get().put(object, object);
+      visitedHolder.get().put(object, object);
       StringBuilder sb = new StringBuilder(getType(object)).append(OPEN);
       sb.append(
           getAllFields(object.getClass()).stream()
@@ -47,7 +48,7 @@ public class LogRenderer {
               .collect(Collectors.joining(DELIMITER)));
       return sb.append(CLOSE).toString();
     } finally {
-      if (initialized) cdb.remove();
+      if (initialized) visitedHolder.remove();
     }
   }
 
@@ -56,7 +57,7 @@ public class LogRenderer {
     if (object == null) return null;
 
     // no recursion
-    if (cdb.get().put(object, object) != null) return null;
+    if (visitedHolder.get().put(object, object) != null) return null;
 
     if (object instanceof LogRenderable) return ((LogRenderable) object).toLogString();
     else {
@@ -124,7 +125,7 @@ public class LogRenderer {
   }
 
   /** this complexity is sadly needed to prevent infinite recursion */
-  static class CircularDependencyBreaker extends ThreadLocal<IdentityHashMap<Object, Object>> {
+  static class AlreadyVisitedObjectsHolder extends ThreadLocal<IdentityHashMap<Object, Object>> {
     public boolean initialize() {
       if (get() == null) {
         set(new IdentityHashMap<>());

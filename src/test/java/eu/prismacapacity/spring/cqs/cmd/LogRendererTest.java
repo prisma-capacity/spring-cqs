@@ -55,7 +55,7 @@ class LogRendererTest {
     @Test
     void clearsThreadLocal() {
       LogRenderer.renderDefault(new Example());
-      Assertions.assertThat(new LogRenderer.CircularDependencyBreaker().get()).isNull();
+      Assertions.assertThat(new LogRenderer.AlreadyVisitedObjectsHolder().get()).isNull();
     }
 
     @Test
