@@ -24,6 +24,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@SuppressWarnings("ALL")
 @ExtendWith(MockitoExtension.class)
 class LogRendererTest {
 
@@ -78,7 +79,7 @@ class LogRendererTest {
   }
 
   static class Base {
-    private static final String mustBeIgnored = "someValue";
+    private static final String MUST_BE_IGNORED = "someValue";
     private final String f3 = "someValue";
   }
 

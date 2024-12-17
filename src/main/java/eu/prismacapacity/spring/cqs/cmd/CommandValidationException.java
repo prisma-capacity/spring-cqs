@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,5 +42,10 @@ public class CommandValidationException extends CommandHandlingException {
 
   public CommandValidationException(@NonNull Throwable e) {
     super(e);
+  }
+
+  public static CommandValidationException wrap(@NonNull Throwable e) {
+    if (e instanceof CommandValidationException) return (CommandValidationException) e;
+    else return new CommandValidationException(e);
   }
 }

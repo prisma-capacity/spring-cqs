@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,25 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * happened while executing the handle method of a
- * ({@link RespondingCommandHandler} or {@link TokenCommandHandler}
+ * happened while executing the handle method of a ({@link RespondingCommandHandler} or {@link
+ * TokenCommandHandler}
  */
 public class CommandHandlingException extends RuntimeException {
 
-	public CommandHandlingException(@NonNull Throwable cause) {
-		super(cause);
-	}
+  public CommandHandlingException(@NonNull Throwable cause) {
+    super(cause);
+  }
 
-	public CommandHandlingException(@NonNull String msg, @NonNull Throwable cause) {
-		super(msg, cause);
-	}
+  public CommandHandlingException(@NonNull String msg, @NonNull Throwable cause) {
+    super(msg, cause);
+  }
 
-	public CommandHandlingException(@NonNull String msg) {
-		super(msg);
-	}
+  public CommandHandlingException(@NonNull String msg) {
+    super(msg);
+  }
+
+  public static CommandHandlingException wrap(@NonNull Throwable e) {
+    if (e instanceof CommandHandlingException) return (CommandHandlingException) e;
+    else return new CommandHandlingException(e);
+  }
 }

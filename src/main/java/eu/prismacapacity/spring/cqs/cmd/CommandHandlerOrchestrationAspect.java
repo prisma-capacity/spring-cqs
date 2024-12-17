@@ -35,7 +35,7 @@ import org.slf4j.spi.*;
  * had aspects, then an abstract class, then aspects again. This is the current incarnation :D
  */
 @Aspect
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "java:S1141"})
 @RequiredArgsConstructor
 public final class CommandHandlerOrchestrationAspect {
 
@@ -67,69 +67,61 @@ public final class CommandHandlerOrchestrationAspect {
 
     C cmd = (C) joinPoint.getArgs()[0];
     ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
+    // happens before executing, so that possible modifications are not reflected
     String renderedCommand = cmd.toLogString();
 
-    try {
-      // happens before executing, so that possible modifications are not reflected
-
-      // validator based validate
-      Set<ConstraintViolation<C>> violations = validator.validate(cmd);
-      if (!violations.isEmpty()) {
-        throw new CommandValidationException(violations);
-      }
-
-      // custom validate
-      try {
-        target.validate(cmd);
-      } catch (CommandValidationException e) {
-        throw e;
-      } catch (Throwable e) {
-        throw new CommandValidationException(e);
-      }
-
-      // verification
-      try {
-        target.verify(cmd);
-      } catch (CommandVerificationException e) {
-        throw e;
-      } catch (Throwable e) {
-        throw new CommandVerificationException(e);
-      }
-
-      // execution
-
-      try {
-        val result = joinPoint.proceed();
-        if (result == null) {
-          if (joinPoint.getTarget() instanceof CommandHandler) {
-            // ok for a void return
-          } else {
-            throw new CommandHandlingException("Response must not be null");
-          }
-        }
-        logSuccess(target, renderedCommand, result);
-        return result;
-      } catch (CommandHandlingException e) {
-        throw e;
-      } catch (Throwable e) {
-        throw new CommandHandlingException(e);
-      }
-
-    } catch (RuntimeException e) {
-      logFailure(target, renderedCommand, e);
+    // validator based validate
+    Set<ConstraintViolation<C>> violations = validator.validate(cmd);
+    if (!violations.isEmpty()) {
+      CommandValidationException e = new CommandValidationException(violations);
+      logAndThrow(target, renderedCommand, e);
       throw e;
     }
+
+    // custom validate
+    try {
+      target.validate(cmd);
+    } catch (Exception e) {
+      logAndThrow(target, renderedCommand, CommandValidationException.wrap(e));
+    }
+
+    // verification
+    try {
+      target.verify(cmd);
+    } catch (Exception e) {
+      logAndThrow(target, renderedCommand, CommandVerificationException.wrap(e));
+    }
+
+    // execution
+    try {
+      val result = joinPoint.proceed();
+      if (result == null) {
+        if (joinPoint.getTarget() instanceof CommandHandler) {
+          // ok for a void return
+        } else {
+          CommandHandlingException e = new CommandHandlingException("Response must not be null");
+          logAndThrow(target, renderedCommand, e);
+        }
+      }
+      logSuccess(target, renderedCommand, result);
+      return result;
+    } catch (Throwable e) {
+      logAndThrow(target, renderedCommand, CommandHandlingException.wrap(e));
+    }
+    return null; // dead code
   }
 
-  private void logFailure(
+  private void logAndThrow(
       @NonNull ICommandHandler<?> handler,
       @NonNull String renderedCommand,
       @NonNull RuntimeException e) {
     DefaultLoggingEventBuilder builder =
-        new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.INFO);
-    builder.log("There was a failure to execute", e);
+        new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.WARN);
+    builder.setMessage("Failed to execute.");
     builder.addKeyValue("command", renderedCommand);
+    builder.setCause(e);
     builder.log();
+    throw e;
   }
 
   private void logSuccess(
@@ -140,7 +132,8 @@ public final class CommandHandlerOrchestrationAspect {
         new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.INFO);
     String optionalResult = "";
     if (result != null) optionalResult = " with result=" + LogRenderer.renderDefault(result);
-    builder.log("Successfully executed{}.", optionalResult);
+    builder.setMessage("Successfully executed{}.");
+    builder.addArgument(optionalResult);
     builder.addKeyValue("command", renderedCommand);
     builder.log();
   }

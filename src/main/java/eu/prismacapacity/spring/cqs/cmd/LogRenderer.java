@@ -51,7 +51,7 @@ public class LogRenderer {
     }
   }
 
-  private String renderValue(@Nullable Object object) {
+  String renderValue(@Nullable Object object) {
     // no nulls
     if (object == null) return null;
 
@@ -70,7 +70,7 @@ public class LogRenderer {
   }
 
   @SuppressWarnings("unchecked")
-  private static String renderCollection(Collection object) {
+  static String renderCollection(Collection object) {
     if (object.isEmpty()) return null; // dont render empty collections
     else {
       Stream stream = object.stream().map(LogRenderer::renderValue);
@@ -78,13 +78,13 @@ public class LogRenderer {
     }
   }
 
-  private static String renderField(Field field, Object target) {
+  static String renderField(Field field, Object target) {
     if (field.getAnnotation(LogExclude.class) == null) {
       return renderKeyValue(field.getName(), getValue(field, target));
     } else return null;
   }
 
-  private static Object getValue(Field field, Object target) {
+  static Object getValue(Field field, Object target) {
     try {
       field.setAccessible(true);
       return field.get(target);
@@ -96,7 +96,7 @@ public class LogRenderer {
   }
 
   @Nullable
-  private static String renderKeyValue(@NonNull String name, @Nullable Object o) {
+  static String renderKeyValue(@NonNull String name, @Nullable Object o) {
     if (o == null) return null; // don't log nulls, we're opinionated here.
 
     String value = renderValue(o);
@@ -106,7 +106,7 @@ public class LogRenderer {
     }
   }
 
-  public static List<Field> getAllFields(@NonNull final Class<?> cls) {
+  static List<Field> getAllFields(@NonNull final Class<?> cls) {
     final List<Field> allFields = new ArrayList<>();
     Class<?> currentClass = cls;
     while (currentClass != null) {
@@ -118,7 +118,7 @@ public class LogRenderer {
     return allFields;
   }
 
-  private static String getType(@NonNull Object object) {
+  static String getType(@NonNull Object object) {
     // may be a good hook to unwrap ...
     return object.getClass().getSimpleName();
   }

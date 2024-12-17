@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2023-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,17 @@
  */
 package eu.prismacapacity.spring.cqs.itest;
 
-import eu.prismacapacity.spring.cqs.cmd.CommandValidationException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import eu.prismacapacity.spring.cqs.cmd.*;
 import eu.prismacapacity.spring.cqs.query.*;
+import java.util.*;
+import nl.altindag.log.LogCaptor;
+import nl.altindag.log.model.LogEvent;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -38,7 +44,7 @@ public class CqsIntegrationTest {
     @Test
     void shouldVThrow() {
       final MyTestQuery query = new MyTestQuery(0);
-      Assertions.assertThatThrownBy(() -> myTestQueryHandler.handle(query))
+      assertThatThrownBy(() -> myTestQueryHandler.handle(query))
           .isInstanceOf(QueryValidationException.class);
     }
   }
@@ -53,8 +59,135 @@ public class CqsIntegrationTest {
     @Test
     void shouldVThrow() {
       final MyTestCommand query = new MyTestCommand(0);
-      Assertions.assertThatThrownBy(() -> myTestCommandHandler.handle(query))
+      assertThatThrownBy(() -> myTestCommandHandler.handle(query))
           .isInstanceOf(CommandValidationException.class);
+    }
+
+    @Test
+    void logSuccess() {
+      LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
+      myTestCommandHandler.handle(new MyTestCommand(27));
+      org.assertj.core.api.Assertions.assertThat(logCaptor.getInfoLogs())
+          .containsExactly("Successfully executed.");
+
+      List<LogEvent> logEvents = logCaptor.getLogEvents();
+      LogEvent success =
+          logEvents.stream()
+              .filter(e -> e.getLoggerName().contains("MyTestCommandHandler"))
+              .findFirst()
+              .orElseThrow(() -> new AssertionFailedError("success message not found"));
+      String renderedCommand =
+          success.getKeyValuePairs().stream()
+              .filter(kv -> kv.getKey().equals("command"))
+              .findFirst()
+              .map(kv -> kv.getValue().toString())
+              .orElseThrow(
+                  () ->
+                      new AssertionFailedError(
+                          "success message does not contain rendered command"));
+      Assertions.assertThat(renderedCommand).contains("age=27");
+    }
+
+    @Test
+    void logValidationFailure() {
+      LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
+
+      assertThatThrownBy(
+              () -> {
+                myTestCommandHandler.handle(new MyTestCommand(-3));
+              })
+          .isInstanceOf(CommandValidationException.class);
+
+      org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
+          .containsExactly("Failed to execute.");
+
+      List<LogEvent> logEvents = logCaptor.getLogEvents();
+      LogEvent failure =
+          logEvents.stream()
+              .filter(e -> e.getLoggerName().contains("MyTestCommandHandler"))
+              .findFirst()
+              .orElseThrow(() -> new AssertionFailedError("failure message not found"));
+      String renderedCommand =
+          failure.getKeyValuePairs().stream()
+              .filter(kv -> kv.getKey().equals("command"))
+              .findFirst()
+              .map(kv -> kv.getValue().toString())
+              .orElseThrow(
+                  () ->
+                      new AssertionFailedError(
+                          "failure message does not contain rendered command"));
+      Assertions.assertThat(failure.getThrowable())
+          .hasValueSatisfying(
+              t -> Assertions.assertThat(t).isInstanceOf(CommandValidationException.class));
+      Assertions.assertThat(renderedCommand).contains("age=-3");
+    }
+
+    @Test
+    void logVerificationFailureThrowingRuntime() {
+      LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
+
+      assertThatThrownBy(
+              () -> {
+                myTestCommandHandler.handle(new MyTestCommand(118));
+              })
+          .isInstanceOf(CommandVerificationException.class);
+
+      org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
+          .containsExactly("Failed to execute.");
+
+      List<LogEvent> logEvents = logCaptor.getLogEvents();
+      LogEvent failure =
+          logEvents.stream()
+              .filter(e -> e.getLoggerName().contains("MyTestCommandHandler"))
+              .findFirst()
+              .orElseThrow(() -> new AssertionFailedError("failure message not found"));
+      String renderedCommand =
+          failure.getKeyValuePairs().stream()
+              .filter(kv -> kv.getKey().equals("command"))
+              .findFirst()
+              .map(kv -> kv.getValue().toString())
+              .orElseThrow(
+                  () ->
+                      new AssertionFailedError(
+                          "failure message does not contain rendered command"));
+      Assertions.assertThat(failure.getThrowable())
+          .hasValueSatisfying(
+              t -> Assertions.assertThat(t).isInstanceOf(CommandVerificationException.class));
+      Assertions.assertThat(renderedCommand).contains("age=118");
+    }
+
+    @Test
+    void logExecutionFailure() {
+      LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
+
+      assertThatThrownBy(
+              () -> {
+                myTestCommandHandler.handle(new MyTestCommand(119));
+              })
+          .isInstanceOf(CommandHandlingException.class);
+
+      org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
+          .containsExactly("Failed to execute.");
+
+      List<LogEvent> logEvents = logCaptor.getLogEvents();
+      LogEvent failure =
+          logEvents.stream()
+              .filter(e -> e.getLoggerName().contains("MyTestCommandHandler"))
+              .findFirst()
+              .orElseThrow(() -> new AssertionFailedError("failure message not found"));
+      String renderedCommand =
+          failure.getKeyValuePairs().stream()
+              .filter(kv -> kv.getKey().equals("command"))
+              .findFirst()
+              .map(kv -> kv.getValue().toString())
+              .orElseThrow(
+                  () ->
+                      new AssertionFailedError(
+                          "failure message does not contain rendered command"));
+      Assertions.assertThat(failure.getThrowable())
+          .hasValueSatisfying(
+              t -> Assertions.assertThat(t).isInstanceOf(CommandHandlingException.class));
+      Assertions.assertThat(renderedCommand).contains("age=119");
     }
   }
 }
