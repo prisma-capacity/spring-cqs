@@ -76,7 +76,8 @@ public final class CommandHandlerOrchestrationAspect {
     } catch (Throwable e) {
       log.warn(
           "A command of {} failed to render for logging. This is a bug, please report to https://github.com/prisma-capacity/spring-cqs/issues . Command execution is not impaired, though.",
-          cmd.getClass());
+          cmd.getClass(),
+          e);
       renderedCommand = cmd.getClass().getName() + "( failed to render )";
     }
     // validator based validate
