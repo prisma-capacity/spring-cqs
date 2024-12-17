@@ -92,10 +92,8 @@ public class CqsIntegrationTest {
     void logValidationFailure() {
       LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
 
-      assertThatThrownBy(
-              () -> {
-                myTestCommandHandler.handle(new MyTestCommand(-3));
-              })
+      MyTestCommand cmd = new MyTestCommand(-3);
+      assertThatThrownBy(() -> myTestCommandHandler.handle(cmd))
           .isInstanceOf(CommandValidationException.class);
 
       org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
@@ -126,10 +124,8 @@ public class CqsIntegrationTest {
     void logVerificationFailureThrowingRuntime() {
       LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
 
-      assertThatThrownBy(
-              () -> {
-                myTestCommandHandler.handle(new MyTestCommand(118));
-              })
+      MyTestCommand query = new MyTestCommand(118);
+      assertThatThrownBy(() -> myTestCommandHandler.handle(query))
           .isInstanceOf(CommandVerificationException.class);
 
       org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
@@ -160,10 +156,8 @@ public class CqsIntegrationTest {
     void logExecutionFailure() {
       LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
 
-      assertThatThrownBy(
-              () -> {
-                myTestCommandHandler.handle(new MyTestCommand(119));
-              })
+      MyTestCommand query = new MyTestCommand(119);
+      assertThatThrownBy(() -> myTestCommandHandler.handle(query))
           .isInstanceOf(CommandHandlingException.class);
 
       org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
