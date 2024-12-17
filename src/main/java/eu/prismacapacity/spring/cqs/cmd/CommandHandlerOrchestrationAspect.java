@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,17 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 import eu.prismacapacity.spring.cqs.retry.RetryUtils;
+import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
+import lombok.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
+import org.slf4j.spi.*;
 
 /**
  * Orchestrates the validation/verification/execution handling of a (Responding)CommandHandler and
@@ -43,9 +46,9 @@ public final class CommandHandlerOrchestrationAspect {
   private static final String PC_TokenCommandHandler =
       "execution(* eu.prismacapacity.spring.cqs.cmd.TokenCommandHandler.handle(..))";
 
-  protected final Validator validator;
+  final Validator validator;
 
-  protected final CommandMetrics metrics;
+  final CommandMetrics metrics;
 
   @Around(
       PC_CommandHandler + " || " + PC_RespondingCommandHandler + " || " + PC_TokenCommandHandler)
@@ -59,52 +62,86 @@ public final class CommandHandlerOrchestrationAspect {
   }
 
   @VisibleForTesting
-  protected <C extends Command> Object process(ProceedingJoinPoint joinPoint)
+  <C extends Command> Object process(ProceedingJoinPoint joinPoint)
       throws CommandHandlingException {
 
     C cmd = (C) joinPoint.getArgs()[0];
     ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
-
-    // validator based validate
-    Set<ConstraintViolation<C>> violations = validator.validate(cmd);
-    if (!violations.isEmpty()) {
-      throw new CommandValidationException(violations);
-    }
-
-    // custom validate
-    try {
-      target.validate(cmd);
-    } catch (CommandValidationException e) {
-      throw e;
-    } catch (Throwable e) {
-      throw new CommandValidationException(e);
-    }
-
-    // verification
-    try {
-      target.verify(cmd);
-    } catch (CommandVerificationException e) {
-      throw e;
-    } catch (Throwable e) {
-      throw new CommandVerificationException(e);
-    }
-
-    // execution
+    String renderedCommand = cmd.toLogString();
 
     try {
-      val result = joinPoint.proceed();
-      if (result == null) {
-        if (joinPoint.getTarget() instanceof CommandHandler) {
-          // ok for a void return
-        } else {
-          throw new CommandHandlingException("Response must not be null");
-        }
+      // happens before executing, so that possible modifications are not reflected
+
+      // validator based validate
+      Set<ConstraintViolation<C>> violations = validator.validate(cmd);
+      if (!violations.isEmpty()) {
+        throw new CommandValidationException(violations);
       }
-      return result;
-    } catch (CommandHandlingException e) {
+
+      // custom validate
+      try {
+        target.validate(cmd);
+      } catch (CommandValidationException e) {
+        throw e;
+      } catch (Throwable e) {
+        throw new CommandValidationException(e);
+      }
+
+      // verification
+      try {
+        target.verify(cmd);
+      } catch (CommandVerificationException e) {
+        throw e;
+      } catch (Throwable e) {
+        throw new CommandVerificationException(e);
+      }
+
+      // execution
+
+      try {
+        val result = joinPoint.proceed();
+        if (result == null) {
+          if (joinPoint.getTarget() instanceof CommandHandler) {
+            // ok for a void return
+          } else {
+            throw new CommandHandlingException("Response must not be null");
+          }
+        }
+        logSuccess(target, renderedCommand, result);
+        return result;
+      } catch (CommandHandlingException e) {
+        throw e;
+      } catch (Throwable e) {
+        throw new CommandHandlingException(e);
+      }
+
+    } catch (RuntimeException e) {
+      logFailure(target, renderedCommand, e);
       throw e;
-    } catch (Throwable e) {
-      throw new CommandHandlingException(e);
     }
+  }
+
+  private void logFailure(
+      @NonNull ICommandHandler<?> handler,
+      @NonNull String renderedCommand,
+      @NonNull RuntimeException e) {
+    DefaultLoggingEventBuilder builder =
+        new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.INFO);
+    builder.log("There was a failure to execute", e);
+    builder.addKeyValue("command", renderedCommand);
+    builder.log();
+  }
+
+  private void logSuccess(
+      @NonNull ICommandHandler<?> handler,
+      @NonNull String renderedCommand,
+      @Nullable Object result) {
+    DefaultLoggingEventBuilder builder =
+        new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.INFO);
+    String optionalResult = "";
+    if (result != null) optionalResult = " with result=" + LogRenderer.renderDefault(result);
+    builder.log("Successfully executed{}.", optionalResult);
+    builder.addKeyValue("command", renderedCommand);
+    builder.log();
   }
 }

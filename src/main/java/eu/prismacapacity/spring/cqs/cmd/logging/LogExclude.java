@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.spring.cqs.cmd;
+package eu.prismacapacity.spring.cqs.cmd.logging;
 
-import eu.prismacapacity.spring.cqs.cmd.logging.LogRenderable;
+import java.lang.annotation.*;
 
-/** marker interface, base for any kind of Command. */
-public interface Command extends LogRenderable {}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface LogExclude {}
