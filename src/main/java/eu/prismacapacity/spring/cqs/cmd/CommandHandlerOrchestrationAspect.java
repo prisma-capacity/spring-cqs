@@ -73,9 +73,7 @@ public final class CommandHandlerOrchestrationAspect {
     // validator based validate
     Set<ConstraintViolation<C>> violations = validator.validate(cmd);
     if (!violations.isEmpty()) {
-      CommandValidationException e = new CommandValidationException(violations);
-      logAndThrow(target, renderedCommand, e);
-      throw e;
+      logAndThrow(target, renderedCommand, new CommandValidationException(violations));
     }
 
     // custom validate
@@ -99,8 +97,8 @@ public final class CommandHandlerOrchestrationAspect {
         if (joinPoint.getTarget() instanceof CommandHandler) {
           // ok for a void return
         } else {
-          CommandHandlingException e = new CommandHandlingException("Response must not be null");
-          logAndThrow(target, renderedCommand, e);
+          logAndThrow(
+              target, renderedCommand, new CommandHandlingException("Response must not be null"));
         }
       }
       logSuccess(target, renderedCommand, result);
