@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.spring.cqs.cmd;
+package eu.prismacapacity.spring.cqs.cmd.logging;
 
-import eu.prismacapacity.spring.cqs.StateToken;
-import eu.prismacapacity.spring.cqs.cmd.logging.LogRenderable;
-import lombok.Value;
+import java.lang.annotation.*;
 
-/** Both token and value can be null. */
-@Value(staticConstructor = "of")
-public class CommandValueResponse<T> implements LogRenderable {
-
-  StateToken token;
-  T value;
-
-  public static <T> CommandValueResponse<T> empty() {
-    return of(null, null);
-  }
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface LogExclude {}

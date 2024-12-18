@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,21 @@ package eu.prismacapacity.spring.cqs.cmd;
 import lombok.NonNull;
 
 /**
- * happened during execution of the verify method of a
- * ({@link RespondingCommandHandler} or {@link TokenCommandHandler}
+ * happened during execution of the verify method of a ({@link RespondingCommandHandler} or {@link
+ * TokenCommandHandler}
  */
-
 public class CommandVerificationException extends CommandHandlingException {
 
-	public CommandVerificationException(@NonNull Throwable e) {
-		super(e);
-	}
+  public CommandVerificationException(@NonNull Throwable e) {
+    super(e);
+  }
 
-	public CommandVerificationException(@NonNull String msg, @NonNull Throwable e) {
-		super(msg, e);
-	}
+  public CommandVerificationException(@NonNull String msg, @NonNull Throwable e) {
+    super(msg, e);
+  }
+
+  public static CommandVerificationException wrap(@NonNull Throwable e) {
+    if (e instanceof CommandVerificationException) return (CommandVerificationException) e;
+    else return new CommandVerificationException(e);
+  }
 }

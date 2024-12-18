@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2023-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,12 @@ import org.springframework.stereotype.Component;
 @Component
 class MyTestCommandHandler implements CommandHandler<MyTestCommand> {
   @Override
-  public void verify(@NonNull MyTestCommand query) throws CommandVerificationException {}
+  public void verify(@NonNull MyTestCommand query) throws CommandVerificationException {
+    if (query.getAge() == 118) throw new RuntimeException("age=118 does not verify");
+  }
 
   @Override
-  public void handle(@NonNull MyTestCommand query) throws CommandHandlingException {}
+  public void handle(@NonNull MyTestCommand query) throws CommandHandlingException {
+    if (query.getAge() == 119) throw new RuntimeException("age=119 fails to execute");
+  }
 }

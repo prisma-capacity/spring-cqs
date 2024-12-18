@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import eu.prismacapacity.spring.cqs.retry.RetryUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -32,8 +32,9 @@ import org.aspectj.lang.annotation.Aspect;
  * had aspects, then an abstract class, then aspects again. This is the current incarnation :D
  */
 @Aspect
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "java:S1141"})
 @RequiredArgsConstructor
+@Slf4j
 public final class CommandHandlerOrchestrationAspect {
 
   private static final String PC_CommandHandler =
@@ -43,9 +44,9 @@ public final class CommandHandlerOrchestrationAspect {
   private static final String PC_TokenCommandHandler =
       "execution(* eu.prismacapacity.spring.cqs.cmd.TokenCommandHandler.handle(..))";
 
-  protected final Validator validator;
+  final Validator validator;
 
-  protected final CommandMetrics metrics;
+  final CommandMetrics metrics;
 
   @Around(
       PC_CommandHandler + " || " + PC_RespondingCommandHandler + " || " + PC_TokenCommandHandler)
@@ -59,52 +60,64 @@ public final class CommandHandlerOrchestrationAspect {
   }
 
   @VisibleForTesting
-  protected <C extends Command> Object process(ProceedingJoinPoint joinPoint)
+  <C extends Command> Object process(ProceedingJoinPoint joinPoint)
       throws CommandHandlingException {
 
     C cmd = (C) joinPoint.getArgs()[0];
+    String commandType = LogRenderer.getType(cmd);
     ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
-
+    String renderedCommand;
+    try {
+      // happens before executing, so that possible modifications are not reflected
+      renderedCommand = cmd.toLogString();
+    } catch (Throwable e) {
+      log.warn(
+          "A command of {} failed to render for logging. This is a bug, please report to https://github.com/prisma-capacity/spring-cqs/issues . Command execution is not impaired, though.",
+          cmd.getClass(),
+          e);
+      renderedCommand = cmd.getClass().getName() + "( failed to render )";
+    }
     // validator based validate
     Set<ConstraintViolation<C>> violations = validator.validate(cmd);
     if (!violations.isEmpty()) {
-      throw new CommandValidationException(violations);
+      Logging.logAndThrow(
+          target, commandType, renderedCommand, new CommandValidationException(violations));
     }
 
     // custom validate
     try {
       target.validate(cmd);
-    } catch (CommandValidationException e) {
-      throw e;
-    } catch (Throwable e) {
-      throw new CommandValidationException(e);
+    } catch (Exception e) {
+      Logging.logAndThrow(target, commandType, renderedCommand, CommandValidationException.wrap(e));
     }
 
     // verification
     try {
       target.verify(cmd);
-    } catch (CommandVerificationException e) {
-      throw e;
-    } catch (Throwable e) {
-      throw new CommandVerificationException(e);
+    } catch (Exception e) {
+      Logging.logAndThrow(
+          target, commandType, renderedCommand, CommandVerificationException.wrap(e));
     }
 
     // execution
-
     try {
       val result = joinPoint.proceed();
       if (result == null) {
         if (joinPoint.getTarget() instanceof CommandHandler) {
           // ok for a void return
         } else {
-          throw new CommandHandlingException("Response must not be null");
+          Logging.logAndThrow(
+              target,
+              commandType,
+              renderedCommand,
+              new CommandHandlingException("Response must not be null"));
         }
       }
+      Logging.logSuccess(target, commandType, renderedCommand, result);
       return result;
-    } catch (CommandHandlingException e) {
-      throw e;
     } catch (Throwable e) {
-      throw new CommandHandlingException(e);
+      Logging.logAndThrow(target, commandType, renderedCommand, CommandHandlingException.wrap(e));
     }
+    return null; // dead code
   }
 }

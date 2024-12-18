@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022-2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2022-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 import static org.mockito.Mockito.*;
 
+import eu.prismacapacity.spring.cqs.StateToken;
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 import eu.prismacapacity.spring.cqs.retry.RetryConfiguration;
 import jakarta.validation.ConstraintViolation;
@@ -250,6 +251,24 @@ class CommandHandlerOrchestrationAspectTest {
       when(handler.handle(cmd)).thenReturn(null);
 
       Assertions.assertThrows(CommandHandlingException.class, () -> underTest.process(joinPoint));
+    }
+
+    @Test
+    void proceedsIfLoggingFails() throws Throwable {
+
+      cmd =
+          new FooCommand() {
+            @Override
+            public String toLogString() {
+              throw new RuntimeException("panic at the disco");
+            }
+          };
+
+      when(joinPoint.proceed()).thenAnswer(invocation -> handler.handle(cmd));
+      when(joinPoint.getArgs()).thenReturn(new Object[] {cmd});
+      when(handler.handle(cmd)).thenReturn(CommandTokenResponse.of(StateToken.random()));
+
+      org.assertj.core.api.Assertions.assertThat(underTest.process(joinPoint)).isNotNull();
     }
 
     @Test

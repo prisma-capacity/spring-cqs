@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2024 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package eu.prismacapacity.spring.cqs.cmd;
 
-/**
- * marker interface, base for any kind of Command.
- */
-public interface Command {
-}
+import eu.prismacapacity.spring.cqs.cmd.logging.LogRenderable;
+
+/** marker interface, base for any kind of Command. */
+public interface Command extends LogRenderable {}
