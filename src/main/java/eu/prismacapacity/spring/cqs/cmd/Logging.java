@@ -29,7 +29,7 @@ public class Logging {
   public static final String LOG_ATTRIBUTE_COMMAND = "cqs.command";
   public static final String LOG_ATTRIBUTE_RESULT = "cqs.result";
 
-  public static void logAndThrow(
+  static void logAndThrow(
       @NonNull ICommandHandler<?> handler,
       @NonNull String commandType,
       @NonNull String renderedCommand,
@@ -46,7 +46,7 @@ public class Logging {
     throw e;
   }
 
-  public static void logSuccess(
+  static void logSuccess(
       @NonNull ICommandHandler<?> handler,
       @NonNull String commandType,
       @NonNull String renderedCommand,
