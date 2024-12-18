@@ -18,6 +18,7 @@ package eu.prismacapacity.spring.cqs.itest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import eu.prismacapacity.spring.cqs.cmd.*;
+import eu.prismacapacity.spring.cqs.cmd.Logging;
 import eu.prismacapacity.spring.cqs.query.*;
 import java.util.*;
 import nl.altindag.log.LogCaptor;
@@ -67,8 +68,10 @@ public class CqsIntegrationTest {
     void logSuccess() {
       LogCaptor logCaptor = LogCaptor.forClass(MyTestCommandHandler.class);
       myTestCommandHandler.handle(new MyTestCommand(27));
-      org.assertj.core.api.Assertions.assertThat(logCaptor.getInfoLogs())
-          .containsExactly("Successfully executed.");
+      org.assertj.core.api.Assertions.assertThat(
+              logCaptor.getInfoLogs().stream().findFirst().orElse("nothing"))
+          .contains("MyTestCommand")
+          .containsIgnoringCase("success");
 
       List<LogEvent> logEvents = logCaptor.getLogEvents();
       LogEvent success =
@@ -78,7 +81,7 @@ public class CqsIntegrationTest {
               .orElseThrow(() -> new AssertionFailedError("success message not found"));
       String renderedCommand =
           success.getKeyValuePairs().stream()
-              .filter(kv -> kv.getKey().equals("command"))
+              .filter(kv -> kv.getKey().equals(Logging.LOG_ATTRIBUTE_COMMAND))
               .findFirst()
               .map(kv -> kv.getValue().toString())
               .orElseThrow(
@@ -96,8 +99,10 @@ public class CqsIntegrationTest {
       assertThatThrownBy(() -> myTestCommandHandler.handle(cmd))
           .isInstanceOf(CommandValidationException.class);
 
-      org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
-          .containsExactly("Failed to execute.");
+      org.assertj.core.api.Assertions.assertThat(
+              logCaptor.getWarnLogs().stream().findFirst().orElse("nothing"))
+          .contains("MyTestCommand")
+          .containsIgnoringCase("fail");
 
       List<LogEvent> logEvents = logCaptor.getLogEvents();
       LogEvent failure =
@@ -107,7 +112,7 @@ public class CqsIntegrationTest {
               .orElseThrow(() -> new AssertionFailedError("failure message not found"));
       String renderedCommand =
           failure.getKeyValuePairs().stream()
-              .filter(kv -> kv.getKey().equals("command"))
+              .filter(kv -> kv.getKey().equals(Logging.LOG_ATTRIBUTE_COMMAND))
               .findFirst()
               .map(kv -> kv.getValue().toString())
               .orElseThrow(
@@ -128,8 +133,10 @@ public class CqsIntegrationTest {
       assertThatThrownBy(() -> myTestCommandHandler.handle(query))
           .isInstanceOf(CommandVerificationException.class);
 
-      org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
-          .containsExactly("Failed to execute.");
+      org.assertj.core.api.Assertions.assertThat(
+              logCaptor.getWarnLogs().stream().findFirst().orElse("nothing"))
+          .contains("MyTestCommand")
+          .containsIgnoringCase("fail");
 
       List<LogEvent> logEvents = logCaptor.getLogEvents();
       LogEvent failure =
@@ -139,7 +146,7 @@ public class CqsIntegrationTest {
               .orElseThrow(() -> new AssertionFailedError("failure message not found"));
       String renderedCommand =
           failure.getKeyValuePairs().stream()
-              .filter(kv -> kv.getKey().equals("command"))
+              .filter(kv -> kv.getKey().equals(Logging.LOG_ATTRIBUTE_COMMAND))
               .findFirst()
               .map(kv -> kv.getValue().toString())
               .orElseThrow(
@@ -160,8 +167,10 @@ public class CqsIntegrationTest {
       assertThatThrownBy(() -> myTestCommandHandler.handle(query))
           .isInstanceOf(CommandHandlingException.class);
 
-      org.assertj.core.api.Assertions.assertThat(logCaptor.getWarnLogs())
-          .containsExactly("Failed to execute.");
+      org.assertj.core.api.Assertions.assertThat(
+              logCaptor.getWarnLogs().stream().findFirst().orElse("nothing"))
+          .contains("MyTestCommand")
+          .containsIgnoringCase("fail");
 
       List<LogEvent> logEvents = logCaptor.getLogEvents();
       LogEvent failure =
@@ -171,7 +180,7 @@ public class CqsIntegrationTest {
               .orElseThrow(() -> new AssertionFailedError("failure message not found"));
       String renderedCommand =
           failure.getKeyValuePairs().stream()
-              .filter(kv -> kv.getKey().equals("command"))
+              .filter(kv -> kv.getKey().equals(Logging.LOG_ATTRIBUTE_COMMAND))
               .findFirst()
               .map(kv -> kv.getValue().toString())
               .orElseThrow(

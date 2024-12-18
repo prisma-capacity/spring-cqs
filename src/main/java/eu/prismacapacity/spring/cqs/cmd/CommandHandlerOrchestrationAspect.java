@@ -17,7 +17,6 @@ package eu.prismacapacity.spring.cqs.cmd;
 
 import eu.prismacapacity.spring.cqs.metrics.CommandMetrics;
 import eu.prismacapacity.spring.cqs.retry.RetryUtils;
-import jakarta.annotation.Nullable;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
@@ -26,9 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
-import org.slf4j.spi.*;
 
 /**
  * Orchestrates the validation/verification/execution handling of a (Responding)CommandHandler and
@@ -68,6 +64,7 @@ public final class CommandHandlerOrchestrationAspect {
       throws CommandHandlingException {
 
     C cmd = (C) joinPoint.getArgs()[0];
+    String commandType = LogRenderer.getType(cmd);
     ICommandHandler<C> target = (ICommandHandler<C>) joinPoint.getTarget();
     String renderedCommand;
     try {
@@ -83,21 +80,23 @@ public final class CommandHandlerOrchestrationAspect {
     // validator based validate
     Set<ConstraintViolation<C>> violations = validator.validate(cmd);
     if (!violations.isEmpty()) {
-      logAndThrow(target, renderedCommand, new CommandValidationException(violations));
+      Logging.logAndThrow(
+          target, commandType, renderedCommand, new CommandValidationException(violations));
     }
 
     // custom validate
     try {
       target.validate(cmd);
     } catch (Exception e) {
-      logAndThrow(target, renderedCommand, CommandValidationException.wrap(e));
+      Logging.logAndThrow(target, commandType, renderedCommand, CommandValidationException.wrap(e));
     }
 
     // verification
     try {
       target.verify(cmd);
     } catch (Exception e) {
-      logAndThrow(target, renderedCommand, CommandVerificationException.wrap(e));
+      Logging.logAndThrow(
+          target, commandType, renderedCommand, CommandVerificationException.wrap(e));
     }
 
     // execution
@@ -107,43 +106,18 @@ public final class CommandHandlerOrchestrationAspect {
         if (joinPoint.getTarget() instanceof CommandHandler) {
           // ok for a void return
         } else {
-          logAndThrow(
-              target, renderedCommand, new CommandHandlingException("Response must not be null"));
+          Logging.logAndThrow(
+              target,
+              commandType,
+              renderedCommand,
+              new CommandHandlingException("Response must not be null"));
         }
       }
-      logSuccess(target, renderedCommand, result);
+      Logging.logSuccess(target, commandType, renderedCommand, result);
       return result;
     } catch (Throwable e) {
-      logAndThrow(target, renderedCommand, CommandHandlingException.wrap(e));
+      Logging.logAndThrow(target, commandType, renderedCommand, CommandHandlingException.wrap(e));
     }
     return null; // dead code
-  }
-
-  private void logAndThrow(
-      @NonNull ICommandHandler<?> handler,
-      @NonNull String renderedCommand,
-      @NonNull RuntimeException e)
-      throws RuntimeException {
-    DefaultLoggingEventBuilder builder =
-        new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.WARN);
-    builder.setMessage("Failed to execute.");
-    builder.addKeyValue("command", renderedCommand);
-    builder.setCause(e);
-    builder.log();
-    throw e;
-  }
-
-  private void logSuccess(
-      @NonNull ICommandHandler<?> handler,
-      @NonNull String renderedCommand,
-      @Nullable Object result) {
-    DefaultLoggingEventBuilder builder =
-        new DefaultLoggingEventBuilder(LoggerFactory.getLogger(handler.getClass()), Level.INFO);
-    String optionalResult = "";
-    if (result != null) optionalResult = " with result=" + LogRenderer.renderDefault(result);
-    builder.setMessage("Successfully executed{}.");
-    builder.addArgument(optionalResult);
-    builder.addKeyValue("command", renderedCommand);
-    builder.log();
   }
 }
