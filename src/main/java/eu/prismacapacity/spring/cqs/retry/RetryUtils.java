@@ -64,25 +64,25 @@ public class RetryUtils {
     return Optional.ofNullable(clazz.getAnnotation(RetryConfiguration.class))
         .map(
             config -> {
-              final RetryPolicy.Builder tplBuilder = RetryPolicy.builder();
+              final RetryPolicy.Builder policyBuilder = RetryPolicy.builder();
 
-              tplBuilder.maxRetries(config.maxAttempts());
+              policyBuilder.maxRetries(config.maxAttempts());
 
               final long interval = config.interval();
               final long maxInterval = config.exponentialBackoffMaxInterval();
 
-              tplBuilder.delay(Duration.ofMillis(interval));
+              policyBuilder.delay(Duration.ofMillis(interval));
               if (maxInterval != 0) {
-                tplBuilder.multiplier(1.2);
-                tplBuilder.maxDelay(Duration.ofMillis(maxInterval));
+                policyBuilder.multiplier(1.2);
+                policyBuilder.maxDelay(Duration.ofMillis(maxInterval));
               }
 
               final Class<? extends Throwable>[] notRetryOn = config.notRetryOn();
               if (notRetryOn != null && notRetryOn.length > 0) {
-                tplBuilder.excludes(notRetryOn);
+                policyBuilder.excludes(notRetryOn);
               }
 
-              return new RetryTemplate(tplBuilder.build());
+              return new RetryTemplate(policyBuilder.build());
             });
   }
 }
