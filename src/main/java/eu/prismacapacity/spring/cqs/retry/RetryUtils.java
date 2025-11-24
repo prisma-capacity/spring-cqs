@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2022-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
  */
 package eu.prismacapacity.spring.cqs.retry;
 
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.support.RetryTemplate;
-import org.springframework.retry.support.RetryTemplateBuilder;
+import org.springframework.core.retry.RetryException;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
 
 @UtilityClass
 public class RetryUtils {
@@ -39,10 +40,21 @@ public class RetryUtils {
     final Optional<RetryTemplate> template = from(handler);
 
     if (template.isPresent()) {
-      return template
-          .get()
-          .execute(
-              (RetryCallback<R, Throwable>) retryContext -> fn.apply(retryContext.getRetryCount()));
+      final AtomicInteger counter = new AtomicInteger(0);
+      try {
+        return template
+            .get()
+            .execute(
+                () -> {
+                  try {
+                    return fn.apply(counter.get());
+                  } finally {
+                    counter.incrementAndGet();
+                  }
+                });
+      } catch (RetryException e) {
+        throw e.getCause();
+      }
     } else {
       return fn.apply(0);
     }
@@ -52,27 +64,25 @@ public class RetryUtils {
     return Optional.ofNullable(clazz.getAnnotation(RetryConfiguration.class))
         .map(
             config -> {
-              final RetryTemplateBuilder tplBuilder = new RetryTemplateBuilder();
+              final RetryPolicy.Builder tplBuilder = RetryPolicy.builder();
 
-              tplBuilder.maxAttempts(config.maxAttempts());
+              tplBuilder.maxRetries(config.maxAttempts());
 
               final long interval = config.interval();
               final long maxInterval = config.exponentialBackoffMaxInterval();
 
+              tplBuilder.delay(Duration.ofMillis(interval));
               if (maxInterval != 0) {
-                tplBuilder.exponentialBackoff(interval, 1.2, maxInterval);
-              } else {
-                tplBuilder.fixedBackoff(interval);
+                tplBuilder.multiplier(1.2);
+                tplBuilder.maxDelay(Duration.ofMillis(maxInterval));
               }
 
               final Class<? extends Throwable>[] notRetryOn = config.notRetryOn();
-
               if (notRetryOn != null && notRetryOn.length > 0) {
-                Arrays.stream(notRetryOn).forEach(tplBuilder::notRetryOn);
-                tplBuilder.traversingCauses();
+                tplBuilder.excludes(notRetryOn);
               }
 
-              return tplBuilder.build();
+              return new RetryTemplate(tplBuilder.build());
             });
   }
 }
