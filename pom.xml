@@ -6,7 +6,7 @@
   <parent>
     <groupId>eu.prismacapacity</groupId>
     <artifactId>basepom-oss</artifactId>
-    <version>0.2.18</version>
+    <version>0.2.19</version>
   </parent>
   <artifactId>spring-cqs</artifactId>
   <version>3.1.2-SNAPSHOT</version>
@@ -48,10 +48,9 @@
     <maven.version>3.3.9</maven.version>
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-    <spring-boot.version>3.2.5</spring-boot.version>
+    <spring-boot.version>3.5.8</spring-boot.version>
     <spring.version>6.2.1</spring.version>
     <spring-retry.version>2.0.11</spring-retry.version>
-    <dependency-check-maven.version>12.1.0</dependency-check-maven.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -159,33 +158,6 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <groups>it</groups>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.13</version>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <excludes>
-            <!-- Spring specific classes -->
-            <exclude>**/*Configuration.*</exclude>
-            <exclude>**/*Application.*</exclude>
-            <!-- Exceptions -->
-            <exclude>**/*Exception.*</exclude>
-            <!-- proto-generated classes -->
-            <exclude>**/gen/*</exclude>
-            <exclude>**/generated/*</exclude>
-            <!-- JDK provided -->
-            <exclude>**/OptionalBehavior*</exclude>
-          </excludes>
         </configuration>
       </plugin>
     </plugins>
