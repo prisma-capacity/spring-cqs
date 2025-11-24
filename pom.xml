@@ -160,33 +160,6 @@
           <groups>it</groups>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.13</version>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <excludes>
-            <!-- Spring specific classes -->
-            <exclude>**/*Configuration.*</exclude>
-            <exclude>**/*Application.*</exclude>
-            <!-- Exceptions -->
-            <exclude>**/*Exception.*</exclude>
-            <!-- proto-generated classes -->
-            <exclude>**/gen/*</exclude>
-            <exclude>**/generated/*</exclude>
-            <!-- JDK provided -->
-            <exclude>**/OptionalBehavior*</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
 
   </build>
