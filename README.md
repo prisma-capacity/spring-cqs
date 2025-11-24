@@ -57,7 +57,7 @@ This is meant to be used with Spring Boot. In order to get this running just add
 |-----------------|---------------------|
 | 2.x.x           | 2.7+                |
 | 3.x.x           | 3.1+                |   
-
+| 4.x.x           | 4.0+                |   
 
 #### Configuration
 
@@ -114,16 +114,18 @@ options.
 
 #### Mandatory Logging of Command Execution (since version 3.1)
 
-Commands have the potential to alter the state of the system (in contrast to queries, which should not). This is why 
-it makes sense to log attempted command executions (regardless of their outcome, may it be success or any kind of 
+Commands have the potential to alter the state of the system (in contrast to queries, which should not). This is why
+it makes sense to log attempted command executions (regardless of their outcome, may it be success or any kind of
 failure). The aspect will take care of that automatically.
 
-When logging command executions, an extra attribute is added to the Log-Event with the name of 'cqs.command' and the value 
-is the so-called LogString of the command. By default this is generated reflectively as a best-effort similar to a 
+When logging command executions, an extra attribute is added to the Log-Event with the name of 'cqs.command' and the
+value
+is the so-called LogString of the command. By default this is generated reflectively as a best-effort similar to a
 toString implementation. As it makes sense to exclude certain fields from logging (for GDPR reasons for example)
-you can annotate fields of your Commands using '@LogExclude' in order to skip those when rendering a command for logging.
+you can annotate fields of your Commands using '@LogExclude' in order to skip those when rendering a command for
+logging.
 
-Also, if your using returning Command handlers, the result will be added as 'cqs.result' with the same rules as 
+Also, if your using returning Command handlers, the result will be added as 'cqs.result' with the same rules as
 for the command.
 
 Failures will go to WARN loglevel while success go to INFO.
@@ -131,8 +133,8 @@ Failures will go to WARN loglevel while success go to INFO.
 #### Tips for use
 
 * Create one handler per use-case.
-* Do not call other handlers inside of yours. If that leads to code duplication, consider refactoring common code into a service that will be used by the two handlers.
-
+* Do not call other handlers inside of yours. If that leads to code duplication, consider refactoring common code into a
+  service that will be used by the two handlers.
 
 ## Migration
 

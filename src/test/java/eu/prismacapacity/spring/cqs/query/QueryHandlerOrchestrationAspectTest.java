@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022-2023 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2022-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,8 +297,8 @@ class QueryHandlerOrchestrationAspectTest {
 
         Assertions.assertThrows(RuntimeException.class, () -> uut.orchestrate(joinPoint));
 
-        verify(uut, times(3)).process(joinPoint);
-        verify(metrics, times(3)).timedQuery(any(), anyInt(), any());
+        verify(uut, times(4)).process(joinPoint);
+        verify(metrics, times(4)).timedQuery(any(), anyInt(), any());
       }
 
       @RetryConfiguration
