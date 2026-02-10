@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022-2024 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2022-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -287,10 +287,10 @@ class CommandHandlerOrchestrationAspectTest {
 
       doThrow(new IllegalStateException("foo")).when(uut).process(joinPoint);
 
-      Assertions.assertThrows(RuntimeException.class, () -> uut.orchestrate(joinPoint));
+      Assertions.assertThrows(IllegalStateException.class, () -> uut.orchestrate(joinPoint));
 
-      verify(uut, times(3)).process(joinPoint);
-      verify(metrics, times(3)).timedCommand(any(), anyInt(), any());
+      verify(uut, times(4)).process(joinPoint);
+      verify(metrics, times(4)).timedCommand(any(), anyInt(), any());
     }
 
     class SimpleCommandHandler implements CommandHandler<SimpleCommand> {
