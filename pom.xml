@@ -48,7 +48,7 @@
     <maven.version>3.3.9</maven.version>
     <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-    <spring-boot.version>4.0.5</spring-boot.version>
+    <spring-boot.version>4.0.6</spring-boot.version>
     <spring.version>6.2.1</spring.version>
     <junit.version>6.0.1</junit.version>
   </properties>
