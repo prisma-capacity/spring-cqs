@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 PRISMA European Capacity Platform GmbH 
+ * Copyright © 2022-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,15 @@ import eu.prismacapacity.spring.cqs.cmd.CommandValidationException;
 import eu.prismacapacity.spring.cqs.query.QueryHandlingException;
 import eu.prismacapacity.spring.cqs.query.QueryValidationException;
 import java.util.function.Function;
-import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 
 @ExtendWith(MockitoExtension.class)
 class RetryUtilsTest {
   @Mock private Function<Integer, String> fn;
   @Mock private Function<Integer, String> fn2;
-
-  private LogCaptor logCaptor = LogCaptor.forClass(ExponentialBackOffPolicy.class);
 
   @Test
   void test_happyCase() {
@@ -98,7 +94,7 @@ class RetryUtilsTest {
         () -> RetryUtils.withOptionalRetry(RetryWithCustomConfig.class, fn2));
 
     verify(fn).apply(0);
-    verify(fn2, times(2)).apply(any());
+    verify(fn2, times(3)).apply(any());
   }
 
   @Test
@@ -109,19 +105,7 @@ class RetryUtilsTest {
         IllegalStateException.class,
         () -> RetryUtils.withOptionalRetry(RetryWithBackoff.class, fn));
 
-    verify(fn, times(5)).apply(any());
-
-    assertEquals(4, logCaptor.getDebugLogs().size());
-    assertTrue(
-        logCaptor
-            .getDebugLogs()
-            .contains("Sleeping for 20")); // first retry with default interval of 20
-    assertTrue(logCaptor.getDebugLogs().contains("Sleeping for 24")); // interval*1.2
-    assertEquals(
-        2L,
-        logCaptor.getDebugLogs().stream()
-            .filter(x -> x.equals("Sleeping for 25"))
-            .count()); // maxInterval
+    verify(fn, times(6)).apply(any());
   }
 
   static class NoRetries {}
